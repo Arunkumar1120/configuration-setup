@@ -1,0 +1,109 @@
+version: '3.9'
+
+services:
+  setup-es-hot:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.3
+    container_name: es-setup-hot
+    user: "0"
+    command: >
+      bash -c '
+        if [ ! -f config/certs/ca.zip ]; then
+          echo "Creating CA";
+          bin/elasticsearch-certutil ca --silent --pem -out config/certs/ca.zip;
+          unzip config/certs/ca.zip -d config/certs;
+        fi;
+        if [ ! -f config/certs/certs.zip ]; then
+          echo "Creating certs for es-hot";
+          echo -ne \
+          "instances:\n"\
+          "  - name: es-hot\n"\
+          "    dns:\n"\
+          "      - es-hot\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "      - PrivateIP\n"\
+          > config/certs/instances.yml;
+          bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
+          unzip config/certs/certs.zip -d config/certs;
+        fi;
+        chown -R 1000:1000 config/certs;
+        find . -type d -exec chmod 750 \{\} \;;
+        find . -type f -exec chmod 640 \{\} \;;
+        echo "Waiting for Elasticsearch availability";
+        until curl -s --cacert config/certs/ca/ca.crt https://es-hot:9200 | grep -q "missing authentication credentials"; do sleep 10; done;
+        echo "Certificates created for es-hot!";
+      '
+    volumes:
+      - ./certs:/usr/share/elasticsearch/config/certs
+    networks:
+      - elastic
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f config/certs/es-hot/es-hot.crt ]"]
+      interval: 1s
+      timeout: 5s
+      retries: 120
+
+  es-hot:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.3
+    container_name: es-hot
+    environment:
+      - node.name=es-hot
+      - cluster.name=elk-cluster
+      - discovery.type=single-node
+      - node.roles=master,data_hot,data,ingest,data_content,remote_cluster_client
+      - node.attr.data=hot
+      - ELASTIC_PASSWORD=password
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=certs/es-hot/es-hot.key
+      - xpack.security.http.ssl.certificate=certs/es-hot/es-hot.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/es-hot/es-hot.key
+      - xpack.security.transport.ssl.certificate=certs/es-hot/es-hot.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - bootstrap.memory_lock=true
+      - node.store.allow_mmap=false
+      - "ES_JAVA_OPTS=-Xms14g -Xmx14g"
+      - logger.level=INFO
+      - network.host=0.0.0.0
+      - transport.host=0.0.0.0
+      - http.host=0.0.0.0
+      - cluster.fault_detection.leader_check.timeout=60s
+      - cluster.fault_detection.follower_check.timeout=60s
+      - cluster.fault_detection.follower_check.retry_count=5
+      - cluster.publish.timeout=60s
+      - discovery.probe.connect_timeout=30s
+      - discovery.request_peers_timeout=60s
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./certs:/usr/share/elasticsearch/config/certs
+      - es-hot-data:/usr/share/elasticsearch/data
+      - ./config/elasticsearch-hot.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - elastic
+    depends_on:
+      setup-es-hot:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+    restart: unless-stopped
+
+volumes:
+  es-hot-data:
+
+networks:
+  elastic:
+    external: true
