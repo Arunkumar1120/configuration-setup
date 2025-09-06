@@ -1,0 +1,23 @@
+Official Documentation : https://www.mongodb.com/docs/manual/tutorial/install-mongodb-community-with-docker/
+Version : 8.0.12
+
+MongoDB is a NoSQL, document-oriented database.
+Instead of tables & rows like SQL databases, it stores data in JSON-like documents (BSON format).
+
+It’s designed for flexibility, scalability, and high availability — perfect for modern applications that deal with unstructured or semi-structured data.
+
+🔹 Key Features
+
+Document model → Stores data as flexible JSON-like documents.
+
+Schema-less → No fixed schema, fields can vary across documents.
+
+Horizontal scaling → Sharding for large datasets.
+
+Replication & HA → Replica sets for fault tolerance.
+
+Rich queries → Filters, aggregation, geospatial, full-text search.
+
+Indexes → Support on any field for fast lookups.
+
+Integration → Works natively with Node.js, Python, Go, Java, etc.
