@@ -1,0 +1,38 @@
+cluster.name: "elk-cluster"
+node.name: "es-cold"
+
+# Network settings
+network.host: 0.0.0.0
+http.port: 9200
+transport.port: 9300
+
+# Node roles - ONLY cold data
+node.roles: [ data_cold ]
+
+# Node attributes for data tiers
+node.attr.data: cold
+
+# Discovery settings
+discovery.seed_hosts: ["es-hot", "es-warm"]
+# NOTE: No cluster.initial_master_nodes - only master nodes should have this
+
+# Path settings
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+
+# Memory settings
+bootstrap.memory_lock: true
+
+# Security settings (enabled to match Docker Compose)
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.http.ssl.enabled: true
+
+# Index settings for cold tier
+cluster.routing.allocation.disk.threshold_enabled: true
+cluster.routing.allocation.disk.watermark.low: 85%
+cluster.routing.allocation.disk.watermark.high: 90%
+cluster.routing.allocation.disk.watermark.flood_stage: 95%
+
+s3.client.default.endpoint: s3.ap-south-1.amazonaws.com
+s3.client.default.region: ap-south-1
