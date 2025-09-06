@@ -1,41 +1,27 @@
-auth:
-  type: LOGIN_FORM
 kafka:
   clusters:
-  - bootstrapServers: 3.82.82.56:9092
+  - bootstrapServers: ip:9092
     kafkaConnect:
-    - address: http://3.82.82.56:8083
+    - address: http://ip:8083
       name: SQL Connector
-    - address: http://3.82.82.56:8084
-      name: MongoDB Connectors
-    ksqldbServer: http://3.82.82.56:8088
-    name: UAT-TBSEFile-Kafka
+    - address: http://ip:8084
+      name: Common Connectors
+    ksqldbServer: http://ip:8088
+    name: Kafka
     properties: {}
     readOnly: false
-    schemaRegistry: http://3.82.82.56:8081
-  - bootstrapServers: 3.82.82.56:9094
-    kafkaConnect:
-    - address: http://3.82.82.56:8074
-      name: SQL Connector
-    - address: http://3.82.82.56:8085
-      name: MongoDB Connectors
-    ksqldbServer: http://3.82.82.56:8089
-    name: TBSBOIR-Kafka
-    properties: {}
-    readOnly: false
-    schemaRegistry: http://3.82.82.56:8082
-  - bootstrapServers: 3.82.82.56:9096
-    kafkaConnect:
-    - address: http://3.82.82.56:8183
-      name: SQL Connector
-    - address: http://3.82.82.56:8184
-      name: MongoDB Connectors
-    ksqldbServer: http://3.82.82.56:8090
-    name: Sandbox-TBSEFile-Kafka
-    properties: {}
-    readOnly: false
-    schemaRegistry: http://3.82.82.56:8181
-rbac:
-  roles: []
+    schemaRegistry: http://ip:8081
+auth:
+  type: OAUTH2
+  oauth2:
+    client:
+      google:
+        provider: google
+        clientId: Google Client ID
+        clientSecret: Google Secret ID
+        redirect-uri: https://url/login/oauth2/code/google
+        user-name-attribute: email
+        custom-params:
+          type: google
+          allowedDomain: 
 webclient: {}
-
