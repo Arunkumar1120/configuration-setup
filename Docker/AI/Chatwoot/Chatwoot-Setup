@@ -1,3 +1,6 @@
+Official Documentation : https://developers.chatwoot.com/self-hosted/deployment/docker
+Version : v4.5.2
+
 Steps to deploy Chatwoot using docker-compose
 ​
 1. Install Docker on your VM
