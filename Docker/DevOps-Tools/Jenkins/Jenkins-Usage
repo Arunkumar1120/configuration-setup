@@ -1,0 +1,37 @@
+Official Documentation : https://www.jenkins.io/doc/book/installing/docker/
+Version : 2.5
+
+Jenkins is an open-source automation server used mainly for CI/CD (Continuous Integration & Continuous Delivery).
+It automates building, testing, and deploying applications, making software delivery faster and more reliable.
+
+🔹 Jenkins Usage
+1. CI/CD Pipelines
+
+Automates your software build → test → deploy workflow.
+
+Supports both:
+Freestyle jobs (simple tasks).
+Pipeline as Code (Jenkinsfile, scripted or declarative).
+
+2. Integration with Source Control
+
+Connects with GitHub, GitLab, Bitbucket, SVN.
+Automatically triggers builds on pull requests, merges, or branch updates.
+
+3. Automated Testing
+
+Run unit tests, integration tests, UI tests automatically.
+Generate reports (JUnit, Allure, etc.).
+
+4. Build Automation
+
+Compile code (Java, Node.js, Python, Go, .NET).
+Build Docker images and push to registries.
+
+5. Deployment Automation
+
+Deploy apps to:
+Kubernetes (kubectl/Helm)
+Docker Compose / Swarm
+AWS, GCP, Azure, DigitalOcean
+Bare-metal or VM servers
