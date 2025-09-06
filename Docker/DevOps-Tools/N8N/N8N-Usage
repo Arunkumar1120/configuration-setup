@@ -1,0 +1,52 @@
+Official Documentation : https://docs.n8n.io/hosting/installation/docker/
+Version : 1.105.1
+
+n8n
+ is an open-source workflow automation platform, similar to Zapier or Integromat, but self-hostable and far more flexible.
+It lets you connect APIs, databases, and services using visual workflows (no-code/low-code).
+
+🔹 n8n Usage
+1. Workflow Automation
+
+Automate repetitive tasks by chaining together services.
+
+2. Integration Hub
+
+Supports 1000+ integrations out of the box:
+SaaS (Slack, Google Drive, HubSpot, Salesforce, Notion).
+Databases (Postgres, MySQL, MongoDB).
+Dev tools (GitHub, GitLab, Jenkins).
+Cloud (AWS, GCP, Azure).
+Messaging (Twilio, Telegram, Discord, WhatsApp).
+
+3. Custom API Workflows
+
+Call REST or GraphQL APIs easily.
+Transform data (JSON, CSV, XML) inside workflows.
+Useful for integrating with internal systems.
+
+4. Event Triggers
+
+Workflows can start from different triggers:
+Webhook trigger (incoming HTTP request).
+Cron trigger (scheduled jobs).
+Database trigger (row insert/update).
+App trigger (e.g., new Gmail email, new Slack message).
+
+
+5. Data Pipelines
+
+Can extract, transform, and load (ETL) data between systems.
+Integrates with data warehouses and APIs.
+
+6. AI + Automation
+
+Integrates with OpenAI, HuggingFace, LangChain.
+Build workflows that combine AI + business logic.
+
+7. Self-Hosting & Extensibility
+
+Runs via Docker, Kubernetes, or bare-metal Node.js.
+Create custom nodes in JavaScript/TypeScript.
+
+Offers webhook endpoints for real-time integrations.
