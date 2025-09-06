@@ -1,0 +1,39 @@
+Official Documentation : https://www.sonatype.com/products/sonatype-nexus-repository
+Version : 3.82
+
+Sonatype Nexus Repository Manager is a repository manager for storing, managing, and distributing software artifacts.
+It acts as a central hub for developers, CI/CD pipelines, and build tools to pull dependencies and publish builds.
+
+🔹 Key Usage Scenarios
+1. Artifact Management
+
+Store build outputs (JARs, WARs, Docker images, npm packages, etc.).
+Host your company’s private packages.
+Manage versioned artifacts for easy rollback.
+
+2. Proxy Repositories (Caching)
+
+Nexus can proxy external repositories (like Maven Central, npm registry, PyPI, Docker Hub).
+Speeds up builds by caching dependencies locally.
+Provides reliability in case external repos are down.
+
+3. Private Repository Hosting
+
+Create your own package registry:
+Java/Maven → Private Maven repository
+npm → Private Node.js registry
+PyPI → Private Python registry
+NuGet → Private .NET registry
+Docker → Private Docker image registry
+
+4. CI/CD Integration
+
+Works with Jenkins, GitHub Actions, GitLab CI/CD, ArgoCD etc.
+Example: Jenkins builds → publish artifact to Nexus → deploy from Nexus.
+
+5. Release & Dependency Control
+
+Enforce policies for dependencies.
+Store both SNAPSHOT (development) and RELEASE (production) artifacts.
+
+Secure internal supply chain with access contro
