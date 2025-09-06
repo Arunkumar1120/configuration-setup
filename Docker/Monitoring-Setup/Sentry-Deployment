@@ -1,0 +1,60 @@
+Official Documentation : https://develop.sentry.dev/self-hosted/
+Version : 22.10.0
+
+VERSION=$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/getsentry/self-hosted/releases/latest)
+VERSION=${VERSION##*/}
+git clone https://github.com/getsentry/self-hosted.git
+cd self-hosted
+git checkout ${VERSION}
+./install.sh
+# After installation, run the following to start Sentry:
+docker compose up --wait
+
+Sentry is an open-source error tracking and performance monitoring tool.
+It helps developers detect, diagnose, and fix issues in applications (backend, frontend, mobile, desktop, etc.).
+
+Think of it as real-time bug tracking + performance tracing for your apps.
+
+🔹 Sentry Usage
+1. Error Monitoring
+
+Captures exceptions, crashes, stack traces from applications.
+Provides context like:
+Function names
+Line numbers
+User session info
+Environment (staging, production)
+
+2. Performance Monitoring
+
+Tracks transaction traces across microservices.
+Shows slow queries, bottlenecks, or endpoints with high latency.
+Provides APM-like features (similar to Datadog, New Relic).
+
+3. Release Tracking
+
+Connects errors to specific deployments/releases.
+Shows if new issues came after a code release.
+Helps with regression tracking.
+
+4. Alerts & Integrations
+
+Alerts when error thresholds are exceeded (e.g., 50 errors/min).
+
+Integrates with:
+Slack, Microsoft Teams, Email, PagerDuty, Jira, GitHub, GitLab.
+
+5. Session Replay (Frontend)
+
+Records user sessions with errors.
+Lets you “watch” how a user encountered an issue in the UI.
+Useful for React, Angular, Vue, etc.
+
+
+6. Multi-Platform Support
+
+Sentry works with:
+Backend → Python (Django, Flask, FastAPI), Node.js, Java, Go, .NET, PHP, Ruby.
+Frontend → React, Angular, Vue, plain JS.
+Mobile → iOS, Android, React Native, Flutter.
+Desktop → Electron, .NET, Qt.
