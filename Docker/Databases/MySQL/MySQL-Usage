@@ -1,0 +1,29 @@
+Official Documentation : https://www.mysql.com/
+Version : 9.4.0
+
+MySQL is one of the most widely used open-source relational database management systems (RDBMS).
+It uses SQL (Structured Query Language) for defining, managing, and querying data.
+
+It’s popular because:
+
+Stable & reliable → used for decades.
+
+Cross-platform → runs on Linux, Windows, Mac.
+
+Open-source & free (with enterprise versions).
+
+Large ecosystem → supported by almost every programming language and framework.
+
+🔹 Key Features
+
+Relational model → Tables, rows, columns, constraints.
+
+Transactions & ACID compliance → Consistency for financial and critical apps.
+
+Replication & Clustering → Master-slave replication, high availability.
+
+Storage engines → InnoDB (default), MyISAM, Memory, etc.
+
+Scalability → Can handle very large datasets with proper tuning.
+
+Security → Users, roles, SSL, encryption, row-level privileges.
