@@ -50,8 +50,10 @@ services:
       SPRING_SECURITY_USER_PASSWORD: "password"
       DYNAMIC_CONFIG_ENABLED: "true"
       KAFKA_SCHEMAREGISTRY_ENABLED: "true"
+      SPRING_CONFIG_ADDITIONAL-LOCATION: /roles.yml
     volumes:
       - ./dynamic_config.yaml:/etc/kafkaui/dynamic_config.yaml
+      - ./roles.yml:/roles.yml
     networks:
       - kafka-network
 
