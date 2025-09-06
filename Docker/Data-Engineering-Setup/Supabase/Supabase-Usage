@@ -1,0 +1,41 @@
+Official Documentation : https://supabase.com/docs/guides/self-hosting/docker
+Version : 2025.09.01-sha-8bf1fd5
+
+Supabase is an open-source Firebase alternative that provides a backend-as-a-service (BaaS).
+It gives you a ready-to-use backend on top of PostgreSQL with APIs, authentication, file storage, and real-time capabilities — so you can build apps quickly without managing all the backend code yourself.
+
+🔹 Key Usage & Features
+
+Database (PostgreSQL)
+
+Fully managed Postgres database.
+
+Auto-generates REST and GraphQL APIs for your tables.
+
+Row-Level Security (RLS) for fine-grained access control.
+
+Authentication & Authorization
+
+Email/password, magic links, OAuth (Google, GitHub, etc.).
+
+JWT-based session management.
+
+Realtime Subscriptions
+
+Listen to database changes in real-time (chat apps, dashboards, etc.).
+
+Storage
+
+Upload, organize, and serve files (images, videos, documents).
+
+Access controlled via policies.
+
+Edge Functions
+
+Deploy serverless functions (similar to AWS Lambda).
+
+APIs
+
+Auto-generated REST/GraphQL APIs.
+
+SDKs for JavaScript, Flutter, Python, etc.
