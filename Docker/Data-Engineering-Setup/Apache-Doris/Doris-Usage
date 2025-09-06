@@ -77,3 +77,6 @@ Example: Run OLAP queries on clickstream + transactional data.
 Store logs (structured/semi-structured) → query fast.
 
 Example: User activity logs → alert on anomalies.
+
+In short:
+Apache Doris = Real-time OLAP DB → great for analytics dashboards, real-time + batch data, BI integration, and ad-hoc SQL queries on large data.
