@@ -1,0 +1,56 @@
+Steps to deploy Chatwoot using docker-compose
+​
+1. Install Docker on your VM
+
+apt-get update
+apt-get upgrade
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+apt install docker-compose-plugin
+​
+2. Download the required files
+
+# Download the env file template
+wget -O .env https://raw.githubusercontent.com/chatwoot/chatwoot/develop/.env.example
+# Download the Docker compose template
+wget -O docker-compose.yaml https://raw.githubusercontent.com/chatwoot/chatwoot/develop/docker-compose.production.yaml
+​
+3. Configure environment variables
+Tweak the .env and docker-compose.yaml according to your preferences. Refer to the available environment variables. You could also remove the dependant services like Postgres, Redis etc., in favor of managed services configured via environment variables.
+
+nano .env
+# update docker-compose.yaml same postgres pass
+nano docker-compose.yaml
+​
+4. Prepare the database
+
+docker compose run --rm rails bundle exec rails db:chatwoot_prepare
+​
+5. Start the services
+
+docker compose up -d
+
+Chatwoot
+ is an open-source customer engagement platform, often called an alternative to Intercom or Zendesk.
+It provides live chat + multichannel inbox + automation for customer support and sales.
+
+🔹 Chatwoot Usage
+1. Live Chat on Website
+
+Embed a chat widget on your website.
+Customers can reach support instantly.
+Supports real-time chat, typing indicators, file sharing, rich messages.
+
+2. Omnichannel Inbox
+
+Centralized shared inbox for different platforms:
+
+Website live chat
+WhatsApp Business
+Facebook Messenger
+Instagram DMs
+Twitter/X DMs
+Telegram
+Line
+Email (IMAP/SMTP)
+SMS (via Twilio, Vonage)
