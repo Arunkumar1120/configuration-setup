@@ -1,0 +1,141 @@
+#ILM Policy
+PUT _ilm/policy/elk-policy
+{
+  "policy": {
+    "phases": {
+      "hot": {
+        "min_age": "0d",
+        "actions": {
+          "set_priority": {
+            "priority": 100
+          },
+          "rollover": {
+            "max_primary_shard_size": "50gb",
+            "max_age": "7d"
+          }
+        }
+      },
+      "warm": {
+        "min_age": "30d",
+        "actions": {
+          "allocate": {
+            "include": {
+              "data": "warm"
+            },
+            "number_of_replicas": 1
+          },
+          "set_priority": {
+            "priority": 50
+          },
+          "forcemerge": {
+            "max_num_segments": 1
+          }
+        }
+      },
+      "cold": {
+        "min_age": "60d",
+        "actions": {
+          "allocate": {
+            "include": {
+              "data": "cold"
+            },
+            "number_of_replicas": 0
+          },
+          "set_priority": {
+            "priority": 0
+          }
+        }
+      }
+    }
+  }
+}
+
+#Index-Templates
+PUT /_index_template/-common-template
+{
+  "index_patterns": ["dev-*"],
+  "template": {
+    "settings": {
+      "index.lifecycle.name": "elk-policy",
+      "index.lifecycle.rollover_alias": "dev-write",
+      "number_of_shards": 1,
+      "number_of_replicas": 0,
+      "index.codec": "best_compression",
+      "index.routing.allocation.require.data": "hot"
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "type": "date",
+          "format": "strict_date_optional_time||epoch_millis"
+        },
+        "message": {
+          "type": "text",
+          "analyzer": "standard"
+        },
+        "level": {
+          "type": "keyword"
+        },
+        "log.level": {
+          "type": "keyword"
+        },
+        "service.name": {
+          "type": "keyword"
+        },
+        "host.hostname": {
+          "type": "keyword"
+        },
+        "process.pid": {
+          "type": "integer"
+        },
+        "elasticsearch.node.name": {
+          "type": "keyword"
+        },
+        "elasticsearch.cluster.name": {
+          "type": "keyword"
+        },
+        "error.type": {
+          "type": "keyword"
+        },
+        "error.message": {
+          "type": "text"
+        },
+        "error.stack_trace": {
+          "type": "text",
+          "index": false
+        },
+        "ecs.version": {
+          "type": "keyword"
+        },
+        "event.dataset": {
+          "type": "keyword"
+        },
+        "process.thread.name": {
+          "type": "keyword"
+        },
+        "log.logger": {
+          "type": "keyword"
+        },
+        "elasticsearch.cluster.uuid": {
+          "type": "keyword"
+        },
+        "elasticsearch.node.id": {
+          "type": "keyword"
+        },
+        "tags": {
+          "type": "keyword"
+        },
+        "fields": {
+          "type": "object",
+          "dynamic": true
+        }
+      }
+    }
+  },
+  "priority": 100,
+  "composed_of": [],
+  "version": 1,
+  "_meta": {
+    "description": "Template for TBS application logs"
+  }
+}
