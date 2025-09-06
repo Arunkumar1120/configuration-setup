@@ -1,0 +1,33 @@
+rbac:
+  roles:
+    - name: "admins"
+      clusters:
+        - DE-Dev-Kafka
+      subjects:
+        - provider: oauth_google
+          type: user
+          value: "user1@gamil.com"
+        - provider: oauth_google
+          type: user
+          value: "user2@gamil.com"
+      permissions:
+        - resource: applicationconfig
+          actions: all
+        - resource: clusterconfig
+          actions: all
+        - resource: topic
+          value: ".*"
+          actions: all
+        - resource: consumer
+          value: ".*"
+          actions: all
+        - resource: schema
+          value: ".*"
+          actions: all
+        - resource: connect
+          value: ".*"
+          actions: [ view, edit, create, restart, delete ]
+        - resource: ksql
+          actions: all
+        - resource: acl
+          actions: all
