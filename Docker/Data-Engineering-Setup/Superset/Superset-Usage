@@ -1,0 +1,39 @@
+Superset Official Documentation : https://superset.apache.org/docs/installation/docker-compose/
+Version : 5.0.0
+
+Apache Superset is an open-source data exploration and business intelligence (BI) tool.
+It lets you connect to databases, query data, and create dashboards and visualizations — similar to Tableau or Power BI, but open-source.
+
+🔹 Key Usage & Features
+
+Data Exploration
+
+Connect to SQL databases (Postgres, MySQL, Snowflake, BigQuery, etc.).
+
+Run queries directly or use the visual query builder.
+
+Dashboards & Visualizations
+
+50+ chart types: line, bar, pie, maps, heatmaps, time-series, etc.
+
+Drag-and-drop dashboard builder.
+
+Filters and drilldowns for interactive exploration.
+
+Authentication & Permissions
+
+Role-based access control (RBAC).
+
+LDAP, OAuth, SSO integrations.
+
+SQL Lab
+
+SQL IDE inside the browser.
+
+Write, run, and share queries.
+
+Scalability
+
+Designed to handle big datasets efficiently.
+
+Integrates with modern data warehouses.
