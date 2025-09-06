@@ -1,0 +1,26 @@
+Official Documentation : https://www.postgresql.org/
+
+PostgreSQL is a free, open-source, object-relational database management system (RDBMS).
+It’s known for being:
+
+Reliable (ACID-compliant, transactions).
+
+Feature-rich (advanced SQL + JSON support).
+
+Extensible (custom types, functions, extensions).
+
+Enterprise-grade (used by banks, SaaS, analytics, startups → everyone).
+
+🔹 Key Features
+
+SQL + NoSQL hybrid → Works with relational data (tables, joins) and semi-structured (JSON, XML).
+
+Transactions & Consistency → Full ACID compliance.
+
+Extensions → PostGIS (GIS/spatial data), TimescaleDB (time-series), pgVector (AI/ML embeddings).
+
+Replication & High Availability → Streaming replication, logical replication, clustering.
+
+Security → Roles, SSL/TLS, row-level security, audit logging.
+
+Stored Procedures & Functions → Written in SQL, PL/pgSQL, Python, C, etc.
