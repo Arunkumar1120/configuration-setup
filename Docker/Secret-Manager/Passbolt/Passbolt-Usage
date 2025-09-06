@@ -1,0 +1,49 @@
+Official Documentation : https://www.passbolt.com/ce/docker
+Version : v4.9.0
+
+Passbolt is an open-source, self-hosted password manager designed for teams and organizations.
+Unlike personal managers like Bitwarden or LastPass, Passbolt is built for collaboration (sharing credentials across teams securely).
+
+It focuses on security-first design:
+
+All secrets are end-to-end encrypted (E2EE) with OpenPGP.
+
+Each user has their own GPG keypair.
+
+Server can’t read the passwords — only the client decrypts them.
+
+🔹 Key Usage & Features
+
+Password Management
+
+Store and organize passwords (API keys, SSH keys, DB credentials, etc.).
+
+Share secrets securely with teams or individuals.
+
+Team Collaboration
+
+Group-based access control.
+
+Assign permissions (view, edit, share).
+
+Strong Security
+
+GPG encryption per user.
+
+MFA support (TOTP, YubiKey, etc.).
+
+Self-hosted, so you keep full control.
+
+Integrations
+
+Browser extensions (Chrome, Firefox, Edge).
+
+REST API for automation.
+
+LDAP/Active Directory support (business edition).
+
+Audit & Compliance
+
+Activity logs (who accessed what).
+
+Helps with compliance (GDPR, SOC2, ISO 27001).
