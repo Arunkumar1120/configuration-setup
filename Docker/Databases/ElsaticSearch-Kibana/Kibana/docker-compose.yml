@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.0.3
+    container_name: kibana
+    environment:
+      - SERVER_NAME=kibana
+      - ELASTICSEARCH_HOSTS=["https://ip:9200"]
+      - ELASTICSEARCH_SERVICEACCOUNTTOKEN=docker exec -it es-hot bin/elasticsearch-service-tokens create elastic/kibana kibana-service-token (need to take this key)
+      - XPACK_SECURITY_ENABLED=true
+      - SERVER_SSL_ENABLED=false
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=5601
+      - SERVER_PUBLICBASEURL=http://ip:5601
+      - ELASTICSEARCH_SSL_VERIFICATIONMODE=none
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=openssl rand -hex 32 (Need to take this key)
+      - XPACK_SECURITY_AUTHC_HTTP_SCHEMES=["apikey","bearer","basic"]
+      - LOGGING_ROOT_LEVEL=info
+      - SERVER_CORS_ENABLED=true
+      - SERVER_CORS_ALLOWORIGIN=["*"]
+      - XPACK_ILM_ENABLED=true
+      - LOGGING_ROOT_LEVEL=info
+    ports:
+      - "5601:5601"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -I http://localhost:5601 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: always
+    networks:
+      - elastic
+
+
+networks:
+  elastic:
+    external: true
