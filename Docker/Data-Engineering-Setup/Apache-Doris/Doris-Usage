@@ -1,0 +1,79 @@
+Official Documentation : https://doris.apache.org/docs/2.0/install/cluster-deployment/run-docker-cluster
+
+Apache Doris is an open-source, high-performance real-time analytical database (OLAP).
+It’s designed for fast queries on large-scale data, especially for analytics dashboards, reporting, and ad-hoc queries.
+
+Think of it as:
+
+Similar to ClickHouse or BigQuery → but simpler to use.
+
+Handles real-time + batch data ingestion.
+
+Supports standard SQL for BI tools.
+
+🔹 Key Features
+
+Real-time + Batch Ingestion
+
+From Kafka, Flink, Spark, MySQL, Hive, Iceberg, etc.
+
+Real-time analytics on streaming + historical data.
+
+Fast OLAP Queries
+
+Millisecond-level response on billions of rows.
+
+Columnar storage + vectorized execution + MPP architecture.
+
+Standard SQL + MySQL Protocol
+
+You can query Doris like MySQL (mysql -h doris_host -P9030).
+
+Compatible with BI tools: Superset, Tableau, PowerBI, Grafana.
+
+Distributed & Scalable
+
+Shared-nothing architecture.
+
+Easy horizontal scaling (just add more nodes).
+
+Storage Engine
+
+Columnar + compression.
+
+Supports indexes (inverted, bitmap, Bloom filter) for acceleration.
+
+🔹 Architecture (Simple View)
+
+FE (Frontend) → Query planning, metadata, client connection.
+
+BE (Backend) → Actual storage & execution.
+
+Broker → Optional, for reading external files (HDFS, S3, etc.).
+
+You need at least 1 FE + 1 BE to run Doris.
+
+🔹 Usage Scenarios
+ 1. Real-time Analytics
+
+Ingest data from Kafka/Flink → Query instantly.
+
+Example: Track orders, website traffic, IoT sensor stats in real time.
+
+ 2. BI Dashboards
+
+Connect BI tools to Doris via SQL/MySQL protocol.
+
+Example: Sales dashboard showing live KPIs on billions of rows.
+
+ 3. Data Warehouse / Lakehouse Query
+
+Query historical + real-time data from Hive, Iceberg, S3, etc.
+
+Example: Run OLAP queries on clickstream + transactional data.
+
+ 4. Log / Monitoring Analysis
+
+Store logs (structured/semi-structured) → query fast.
+
+Example: User activity logs → alert on anomalies.
