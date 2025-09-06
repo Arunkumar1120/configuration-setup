@@ -1,0 +1,96 @@
+Official Documentation : https://docs.open-metadata.org/latest/deployment/docker
+
+OpenMetadata is an open-source metadata management & data governance platform.
+It’s like a central hub for discovering, cataloging, governing, and collaborating on all your data assets (databases, tables, pipelines, dashboards, ML models, etc.).
+
+🔹 Key Features & Usage
+ 1. Data Catalog / Discovery
+
+Connects to databases, data warehouses, lakes, BI tools, ML systems.
+
+Automatically extracts metadata (schemas, lineage, profiling, usage).
+
+Lets you search across all datasets & dashboards.
+
+Example: Search for "customer_id" → see where it exists (Postgres table, Snowflake table, dbt model, Looker dashboard).
+
+ 2. Data Lineage
+
+Tracks end-to-end flow of data across systems.
+
+Helps debug “where did this column come from?” or “why is my dashboard wrong?”.
+
+Example: Kafka → Flink → Snowflake → dbt → Looker → Business dashboard.
+
+ 3. Data Quality & Profiling
+
+Run data quality tests (null check, uniqueness, referential integrity).
+
+Profile datasets → distribution, min/max, null %, row count.
+
+Alerts on anomalies.
+
+Example: Ensure email column in users table is never null.
+
+ 4. Governance & Policies
+
+Define ownership (who owns this dataset?).
+
+Tag sensitive data (PII, GDPR, HIPAA).
+
+Set access policies for roles.
+
+Example: Mark SSN column as PII → restrict usage → alert if exposed in reports.
+
+ 5. Collaboration
+
+Business glossary (define terms like “Active User”).
+
+Comments, reviews, discussions directly on datasets.
+
+Data ownership assignment.
+
+Example: Finance analyst asks a question directly on the "revenue" dashboard metadata page.
+
+ 6. Integration
+
+Supports data sources: Snowflake, BigQuery, Postgres, MySQL, Redshift, Kafka, Flink, dbt, Airflow, Looker, PowerBI, Tableau, Superset, MLflow, etc.
+
+APIs + OpenMetadata UI.
+
+🔹 Usage in Companies
+
+Data Engineers → manage pipelines & lineage.
+
+Data Analysts → discover trusted datasets.
+
+Data Scientists → explore ML-ready features.
+
+Governance Teams → enforce compliance & track sensitive data.
+
+🔹 Example Flow with OpenMetadata
+
+Ingest metadata → Connect to Postgres, Kafka, dbt, Looker.
+
+Catalog → Tables, topics, dashboards are auto-discovered.
+
+Add ownership & glossary → Assign dataset owners, define "Customer".
+
+Track lineage → See how raw → curated → reports.
+
+Quality tests → Ensure "order_id" is unique.
+
+Collaborate → Analysts ask questions, engineers respond within OpenMetadata.
+
+🔹 Why Use OpenMetadata?
+
+Single source of truth for metadata.
+
+Boost trust in data (no more “which dataset is correct?”).
+
+Improve productivity (search instead of asking Slack/Email).
+
+Enable governance & compliance (PII tracking, auditability).
+
+⚡ In short:
+OpenMetadata = central data catalog + lineage + quality + governance + collaboration platform.
