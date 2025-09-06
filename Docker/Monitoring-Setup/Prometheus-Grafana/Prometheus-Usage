@@ -1,0 +1,80 @@
+Official Documentation : https://grafana.com/docs/grafana-cloud/send-data/metrics/metrics-prometheus/prometheus-config-examples/docker-compose-linux/
+
+Prometheus Version : v3.5.0
+Grafana Version : 12.2.0-17449462949-ubuntu
+
+🔹 Prometheus Usage
+
+Prometheus is an open-source monitoring and alerting system, widely used for metrics collection in cloud-native environments (especially Kubernetes, Docker, microservices).
+
+Key Uses:
+
+Metrics Collection
+
+Scrapes metrics from applications, exporters, and system endpoints (/metrics).
+
+Works with pull-based model (Prometheus pulls data at intervals).
+
+Stores metrics in a time-series database.
+
+Exporters
+
+Prometheus uses exporters to collect metrics from different systems:
+
+Node Exporter → Linux system metrics (CPU, memory, disk, network).
+
+cAdvisor → Container metrics.
+
+Blackbox Exporter → HTTP, TCP, DNS, ICMP probes.
+
+Kafka / MySQL / Redis exporters → Application-specific metrics.
+
+Alerting
+
+With Alertmanager, you can set alert rules (e.g., CPU > 90%, service down).
+
+Sends alerts to Slack, Email, PagerDuty, Webhooks.
+
+Integrations
+
+Works well with Kubernetes (service discovery).
+
+Can scrape application custom metrics (via client libraries in Go, Java, Python, etc.).
+
+🔹 Grafana Usage
+
+Grafana is a visualization and analytics platform. It is often paired with Prometheus for dashboards.
+
+Key Uses:
+
+Visualization
+
+Connects to Prometheus and other data sources (Elasticsearch, Loki, InfluxDB, etc.).
+
+Create dashboards with charts, graphs, heatmaps, single-stat panels.
+
+Dashboards
+
+Prebuilt dashboards for Kubernetes, Docker, MySQL, Kafka, Redis, etc.
+
+Custom dashboards for your applications.
+
+Alerting
+
+Alerts can be configured directly in Grafana (or integrated from Prometheus).
+
+Supports notification channels like Slack, Teams, Email, Webhooks.
+
+Advanced Features
+
+Annotations → Mark deployments or incidents on graphs.
+
+Templating → Dynamic dashboards (choose namespace, pod, service).
+
+Variables → Filter dashboards per environment (staging, prod).
+
+🔹 Prometheus + Grafana Together
+
+Prometheus → Collects, stores, and queries metrics.
+
+Grafana → Visualizes those metrics in beautiful dashboards.
