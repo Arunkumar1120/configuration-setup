@@ -1,0 +1,62 @@
+version: "2.2"
+services:
+  jobmanager:
+    build: .
+    image: de-flink:2.0.0
+    dns:
+      - 8.8.8.8
+    ports:
+      - "8123:8081"
+    command: jobmanager
+    environment:
+      TZ: America/New_York
+      HADOOP_CONF_DIR: /opt/hadoop/conf
+      HIVE_CONF_DIR: /opt/flink/custom_conf/hive-conf/
+        #ROOT_LOG_LEVEL: DEBUG
+    volumes:
+      - flink-statebackend:/opt/flink/statebackend
+      - flink-jobmanger:/opt/flink
+      - ./hadoop:/opt/hadoop/conf
+    networks:
+      - DE-network
+
+  taskmanager:
+    build: .
+    image: de-flink:2.0.0
+    command: taskmanager
+    deploy:
+      replicas: 4
+    environment:
+      TZ: America/New_York
+      HADOOP_CONF_DIR: /opt/hadoop/conf
+      HIVE_CONF_DIR: /opt/flink/custom_conf/hive-conf
+        #ROOT_LOG_LEVEL: DEBUG
+    volumes:
+      - flink-statebackend:/opt/flink/statebackend
+      - flink-jobmanger:/opt/flink
+      - ./hadoop:/opt/hadoop/conf
+    networks:
+      - DE-network
+
+  sql-client:
+    build: .
+    image: de-flink:2.0.0
+    command: bin/sql-client.sh
+    depends_on:
+      - jobmanager
+    environment:
+      TZ: America/New_York
+    volumes:
+      - flink-sql-client:/opt/flink
+    networks:
+      - DE-network
+
+volumes:
+  flink-jobmanger:
+  flink-statebackend:
+  flink-sql-client:
+
+networks:
+  DE-network:
+    external: true
+
