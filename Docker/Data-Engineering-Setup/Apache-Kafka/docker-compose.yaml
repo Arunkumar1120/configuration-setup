@@ -1,0 +1,185 @@
+version: '3.7'
+
+services:
+  broker-tbsefile-uat:
+    image: apache/kafka
+    container_name: broker-tbsefile-uat
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+      - "7071:7071"
+    environment:
+      TZ: "America/New_York"  # Set timezone
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://broker-tbsefile-uat:9092,CONTROLLER://broker-tbsefile-uat:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://3.82.82.56:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker-tbsefile-uat:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 2
+      KAFKA_LOG_RETENTION_HOURS: "720"
+      KAFKA_MESSAGE_MAX_BYTES: "52428800"
+      KAFKA_LOG_DIR: /opt/kafka/logs
+      KAFKA_HEAP_OPTS: "-Xmx10g -Xms10g"
+      KAFKA_REMOTE_LOG_STORAGE_SYSTEM_ENABLE: "false"
+    user: "0:0"
+    networks:
+      - kafka-network
+    volumes:
+      - tbs-apachekafkalogs-tbsefile-uat:/kafka
+      - tbs-apachekafkaserver-tbsefile-uat:/opt/kafka
+      - broker-data-tbsefile-uat:/opt/kafka/logs
+
+  kafka-ui-tbsefile-uat:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui-tbsefile-uat
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      TZ: "America/New_York"  # Set timezone
+      KAFKA_CLUSTERS_0_NAME: "uat TBSEFile Kafka"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "broker-tbsefile-uat:9092"
+      AUTH_TYPE: "LOGIN_FORM"
+      SPRING_SECURITY_USER_NAME: "kafkatbsuat"
+      SPRING_SECURITY_USER_PASSWORD: ")@kenfc148nc"
+      DYNAMIC_CONFIG_ENABLED: "true"
+      KAFKA_SCHEMAREGISTRY_ENABLED: "true"
+    volumes:
+      - ./dynamic_config.yaml:/etc/kafkaui/dynamic_config.yaml
+    networks:
+      - kafka-network
+
+  schema-registry-tbsefile-uat:
+    image: confluentinc/cp-schema-registry:latest
+    container_name: schema-registry-tbsefile-uat
+    restart: always
+    depends_on:
+      - broker-tbsefile-uat
+    ports:
+      - "8081:8081"
+    environment:
+      TZ: "America/New_York"  # Set timezone
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'PLAINTEXT://broker-tbsefile-uat:9092'
+      SCHEMA_REGISTRY_HOST_NAME: 'schema-registry'
+      SCHEMA_REGISTRY_LISTENERS: 'http://0.0.0.0:8081'
+      SCHEMA_REGISTRY_DEBUG: 'false'
+    volumes:
+      - tbs-schema-registry-tbsefile-uat:/etc/schema-registry
+    networks:
+      - kafka-network
+
+  ksqldb-server-tbsefile-uat:
+    image: confluentinc/ksqldb-server:latest
+    container_name: ksqldb-server-tbsefile-uat
+    restart: always
+    ports:
+      - "8088:8088"
+    environment:
+      TZ: "America/New_York"  # Set timezone
+      KSQL_LISTENERS: "http://0.0.0.0:8088"
+      KSQL_BOOTSTRAP_SERVERS: "broker-tbsefile-uat:9092"
+      KSQL_KSQL_SCHEMA_REGISTRY_URL: "http://schema-registry-tbsefile-uat:8081"
+      KSQL_KSQL_SERVICE_ID: "ksql_service_id"
+    depends_on:
+      - broker-tbsefile-uat
+      - schema-registry-tbsefile-uat
+    volumes:
+      - tbs-ksqldb-tbsefile-uat:/bin
+    networks:
+      - kafka-network
+
+  kafka-sql-connect-tbsefile-uat:
+    image: debezium/connect:3.0.0.Final
+    container_name: kafka-sql-connect-tbsefile-uat
+    restart: always
+    ports:
+      - "8083:8083"
+      - "9012:9012"
+    environment:
+      TZ: "America/New_York"  # Set timezone
+      GROUP_ID: "1"
+      CONFIG_STORAGE_TOPIC: "connect-configs"
+      OFFSET_STORAGE_TOPIC: "connect-offsets"
+      STATUS_STORAGE_TOPIC: "connect-status"
+      BOOTSTRAP_SERVERS: "broker-tbsefile-uat:9092"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect-tbsefile-uat"
+      CONNECT_REST_PORT: 8083
+      KAFKA_CONNECT_PLUGINS_DIR: "/kafka/connect/"
+      CONFIG_STORAGE_REPLICATION_FACTOR: "1"
+      OFFSET_STORAGE_REPLICATION_FACTOR: "1"
+      STATUS_STORAGE_REPLICATION_FACTOR: "1"
+      KEY_CONVERTER: "io.confluent.connect.avro.AvroConverter"
+      VALUE_CONVERTER: "io.confluent.connect.avro.AvroConverter"
+      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry-tbsefile-uat:8081"
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: "http://schema-registry-tbsefile-uat:8081"
+      OFFSET_STORAGE_TOPIC_REPLICATION_FACTOR: "1"
+      CONNECTOR_STATUS_TOPIC_CLEANUP_POLICY: "compact"
+      OFFSET_STORAGE_TOPIC_CLEANUP_POLICY: "compact"
+    volumes:
+      - tbs-kafka_debezium_connector_logs-tbsefile-uat:/kafka/logs
+      - tbs-kafka_debezium_connector-tbsefile-uat:/kafka
+      - ./confluentinc-kafka-connect-avro-converter-7.9.0/lib:/kafka/connect/libs
+    depends_on:
+      - broker-tbsefile-uat
+      - schema-registry-tbsefile-uat
+    networks:
+      - kafka-network
+
+
+  kafka-common-connect-tbsefile-uat:
+    image: confluentinc/cp-kafka-connect:7.4.1
+    container_name: kafka-common-connect-tbsefile-uat
+    ports:
+      - "8084:8083"
+      - "9014:9014"
+    environment:
+      TZ: "America/New_York"  # Set timezone
+      CONNECT_BOOTSTRAP_SERVERS: "broker-tbsefile-uat:9092"
+      CONNECT_GROUP_ID: "my-connect-group"
+      CONNECT_CONFIG_STORAGE_TOPIC: "my-connect-configs"
+      CONNECT_OFFSET_STORAGE_TOPIC: "my-connect-offsets55"
+      CONNECT_STATUS_STORAGE_TOPIC: "my-connect-status55"
+      CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_REST_ADVERTISED_HOST_NAME: "kafka-connect-mongodb-tbsefile-uat"
+      CONNECT_REST_PORT: 8084
+      CONNECT_PLUGIN_PATH: "/usr/share/java,/target"
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+      CONNECT_OFFSET_FLUSH_TIMEOUT_MS: 5000
+      CONNECT_LOG_FLUSH_INTERVAL_MESSAGES: 10
+      CONNECT_LOG_FLUSH_INTERVAL_MS: 10000
+      CONNECT_CONFIG_STORAGE_CLEANUP_POLICY: "compact"
+      CONNECT_OFFSET_STORAGE_CLEANUP_POLICY: "compact"
+      CONNECT_STATUS_STORAGE_CLEANUP_POLICY: "compact"
+      CONNECT_TOPIC_CREATION_ENABLE: "true"
+      CONNECT_PLUGIN_CLIENT_CONFIG_OVERRIDE_POLICY: "All"
+      CONNECT_CONNECTOR_CLIENT_CONFIG_OVERRIDE_POLICY: "All"
+      CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+    networks:
+      - kafka-network
+    volumes:
+      - ./plugins:/target
+
+
+volumes:
+  tbs-apachekafkalogs-tbsefile-uat:
+  tbs-apachekafkaserver-tbsefile-uat:
+  tbs-schema-registry-tbsefile-uat:
+  tbs-ksqldb-tbsefile-uat:
+  tbs-kafka_debezium_connector-tbsefile-uat:
+  tbs-kafka_debezium_connector_logs-tbsefile-uat:
+  broker-data-tbsefile-uat:
+networks:
+  kafka-network:
+    external: true
+

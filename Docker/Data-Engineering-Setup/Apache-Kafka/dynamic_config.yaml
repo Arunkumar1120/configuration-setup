@@ -1,0 +1,41 @@
+auth:
+  type: LOGIN_FORM
+kafka:
+  clusters:
+  - bootstrapServers: 3.82.82.56:9092
+    kafkaConnect:
+    - address: http://3.82.82.56:8083
+      name: SQL Connector
+    - address: http://3.82.82.56:8084
+      name: MongoDB Connectors
+    ksqldbServer: http://3.82.82.56:8088
+    name: UAT-TBSEFile-Kafka
+    properties: {}
+    readOnly: false
+    schemaRegistry: http://3.82.82.56:8081
+  - bootstrapServers: 3.82.82.56:9094
+    kafkaConnect:
+    - address: http://3.82.82.56:8074
+      name: SQL Connector
+    - address: http://3.82.82.56:8085
+      name: MongoDB Connectors
+    ksqldbServer: http://3.82.82.56:8089
+    name: TBSBOIR-Kafka
+    properties: {}
+    readOnly: false
+    schemaRegistry: http://3.82.82.56:8082
+  - bootstrapServers: 3.82.82.56:9096
+    kafkaConnect:
+    - address: http://3.82.82.56:8183
+      name: SQL Connector
+    - address: http://3.82.82.56:8184
+      name: MongoDB Connectors
+    ksqldbServer: http://3.82.82.56:8090
+    name: Sandbox-TBSEFile-Kafka
+    properties: {}
+    readOnly: false
+    schemaRegistry: http://3.82.82.56:8181
+rbac:
+  roles: []
+webclient: {}
+
