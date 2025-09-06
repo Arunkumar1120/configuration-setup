@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  status-page:
+    image: elestio/uptime-kuma
+    ports:
+      - "4000:3001"  # Map container port 80 to host port 8080
+    environment:
+      - DB_TYPE=sqlite
+      - DB_STORAGE=/app/data/uptime-kuma.db
+      - SOFTWARE_VERSION_TAG=latest
+      - URL=https://de-statuspage.spanllc.com
+    volumes:
+      - ./data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: always
+    networks:
+      - status-page   # Define as an array
+    healthcheck:
+      disable: true
+
+networks:
+  status-page:
+    external: true
