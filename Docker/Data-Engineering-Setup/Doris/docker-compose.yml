@@ -5,7 +5,7 @@ services:
     hostname: fe
     container_name: doris-fe
     environment:
-      - FE_SERVERS=fe1:172.20.0.188:9010
+      - FE_SERVERS=fe1:ip:9010
       - FE_ID=1
       - JAVA_OPTS_FOR_JDK_17=-Xms6g -Xmx6g -XX:+UseG1GC
     volumes:
@@ -20,8 +20,8 @@ services:
     hostname: be
     container_name: doris-be
     environment:
-      - FE_SERVERS=fe1:172.20.0.188:9010
-      - BE_ADDR=172.20.0.188:9050
+      - FE_SERVERS=fe1:ip:9010
+      - BE_ADDR=ip:9050
     volumes:
       - ./data/be/storage/:/opt/apache-doris/be/storage/
       - ./data/be/conf:/opt/apache-doris/be/conf  
