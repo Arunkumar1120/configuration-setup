@@ -1,0 +1,25 @@
+Official Documentation : https://redis.io/docs/latest/operate/oss_and_stack/install/install-stack/docker/
+Redis Version : 7.4
+
+Redis = Remote Dictionary Server.
+It’s an open-source, in-memory data store that can be used as a:
+Cache
+Database
+Message broker / streaming system
+Because it stores everything in RAM, it’s extremely fast (sub-millisecond latency).
+
+🔹 Key Features
+
+In-memory → Super-fast reads/writes.
+
+Data Structures → Strings, Lists, Sets, Hashes, Sorted Sets, Streams, Bitmaps, HyperLogLogs, etc.
+
+Persistence → Snapshots (RDB) or Append-only file (AOF) → so data isn’t lost.
+
+Replication & Clustering → Master-replica, sharding for horizontal scaling.
+
+Pub/Sub Messaging → Lightweight message broker.
+
+TTL (Expire Keys) → Perfect for caching.
+
+Lua Scripting → Custom server-side logic.
