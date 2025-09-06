@@ -1,0 +1,60 @@
+version: '3.8'
+services:
+  postgres-n8n-prod:
+    image: postgres:16
+    restart: always
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+      - POSTGRES_NON_ROOT_USER
+      - POSTGRES_NON_ROOT_PASSWORD
+      # This ensures the postgres user has proper permissions
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - db_storage-prod:/var/lib/postgresql/data
+      - ./init-data.sh:/docker-entrypoint-initdb.d/init-data.sh
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - 5436:5432
+    networks:
+      - tools
+  n8nprod:
+    image: docker.n8n.io/n8nio/n8n:1.105.4
+    restart: always
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres-n8n-prod
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${POSTGRES_DB}
+      # Important: Try using the postgres superuser instead of non-root
+      - DB_POSTGRESDB_USER=${POSTGRES_USER}
+      - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_PROTOCOL=http
+      - N8N_SECURE_COOKIE=false
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - N8N_EDITOR_BASE_URL=https://url
+      - WEBHOOK_URL=https://url
+    ports:
+      - 5679:5678
+    links:
+      - postgres-n8n-prod
+    volumes:
+      - n8n_storage-prod:/home/node/.n8n
+    depends_on:
+      postgres-n8n-prod:
+        condition: service_healthy
+    networks:
+      - tools
+volumes:
+  db_storage-prod:
+  n8n_storage-prod:
+networks:
+  tools:
+    external: true
+
