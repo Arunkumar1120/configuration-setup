@@ -179,7 +179,7 @@ volumes:
   schema-registry:
   ksqldb:
   kafka_debezium_connector:
-  -kafka_debezium_connector_logs:
+  kafka_debezium_connector_logs:
   broker-data:
 networks:
   kafka-network:
