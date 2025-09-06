@@ -1,0 +1,76 @@
+Official Documentation : https://signoz.io/docs/install/docker/
+Signoz Version : v0.129.4
+
+🔹 OpenTelemetry (OTel) Usage
+
+OpenTelemetry is a CNCF project that provides a vendor-neutral standard for collecting metrics, logs, and traces.
+
+Key Uses:
+
+Instrumentation
+
+Language SDKs (Java, Python, Go, Node.js, .NET, etc.) to add tracing and metrics to your app.
+
+Auto-instrumentation for frameworks (Spring Boot, Flask, Express.js, gRPC, etc.).
+
+Telemetry Data Types
+
+Traces → Distributed tracing (e.g., how a request flows across microservices).
+
+Metrics → Performance data (latency, throughput, memory, CPU).
+
+Logs → Structured/unstructured logs linked with traces.
+
+OTel Collector
+
+Receives telemetry from applications.
+
+Can process, filter, batch, and export to backends like:
+
+SigNoz
+Prometheus
+Jaeger
+Tempo
+Elasticsearch
+
+Cloud services (AWS X-Ray, GCP Cloud Trace, Azure Monitor).
+
+🔹 SigNoz Usage
+
+SigNoz is an open-source APM (Application Performance Monitoring) & observability platform, built to be a self-hosted alternative to Datadog / New Relic.
+
+Key Uses:
+
+Distributed Tracing (via OTel)
+
+Visualize request flows across microservices.
+
+Spot bottlenecks and high-latency services.
+
+Metrics Monitoring
+
+Out-of-the-box dashboards for system and application metrics.
+
+Custom metrics from OTel SDKs or Prometheus exporters.
+
+Log Management
+
+Collect, search, and correlate logs.
+
+Link logs directly with traces for root-cause analysis.
+
+Dashboards & Alerts
+
+Similar to Grafana, but integrated with tracing and logs.
+
+Alerts via Slack, PagerDuty, Opsgenie, etc.
+
+Kubernetes & Docker Monitoring
+
+Auto-collects cluster metrics, pod health, and service traces.
+
+🔹 SigNoz + OTel Together
+
+OpenTelemetry → Standard way to instrument and collect telemetry.
+
+SigNoz → Storage + visualization + alerting backend for telemetry.
