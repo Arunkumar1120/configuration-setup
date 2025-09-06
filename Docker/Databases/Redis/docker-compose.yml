@@ -1,0 +1,17 @@
+version: '3'
+services:
+  redis:
+    build:
+      context: .
+      dockerfile: Dockerfile.redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data:/data
+    networks:
+      - redis
+
+networks:
+  redis:
+    external: true
