@@ -1,4 +1,5 @@
 Official Documentation : https://docs.open-metadata.org/latest/deployment/docker
+Version : 1.9.7
 
 OpenMetadata is an open-source metadata management & data governance platform.
 It’s like a central hub for discovering, cataloging, governing, and collaborating on all your data assets (databases, tables, pipelines, dashboards, ML models, etc.).
