@@ -139,3 +139,47 @@ PUT /_index_template/-common-template
     "description": "Template for TBS application logs"
   }
 }
+
+#Index Operation
+
+GET /_ilm/policy/elk-policy
+
+# Check template exists
+GET /_index_template/common-template
+
+# Check indices exist
+GET /_cat/indices/dev-*?v
+
+# Verify template was applied to indices
+GET /dev-request-response-logs-sprint/_settings
+GET /dev-request-response-logs-stage/_settings
+
+# Check ILM status (should show no errors)
+GET /dev-request-response-logs-sprint/_ilm/explain
+GET /dev-request-response-logs-stage/_ilm/explain
+
+# Verify mapping was applied
+GET /dev-request-response-logs-sprint/_mapping
+GET /dev-request-response-logs-stage/_mapping
+
+GET /_cat/indices/dev-*?v&h=index,health,status,pri,rep,docs.count,store.size
+GET /_cat/shards/dev-*?v
+
+GET /_cat/shards?v&h=index,shard,prirep,state,unassigned.reason&s=state
+GET /_cluster/allocation/explain
+GET /_cluster/health
+
+#Monitoring Commands
+GET /index_name/_ilm/explain
+
+# Check allocation decisions
+GET /_cluster/allocation/explain
+
+# Monitor cluster stats
+GET /_cluster/stats
+
+# Check pending tasks
+GET /_cluster/pending_tasks
+
+# Monitor thread pools
+GET /_nodes/stats/thread_pool
