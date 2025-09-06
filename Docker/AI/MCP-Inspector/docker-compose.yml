@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  mcp-inspector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mcp-inspector:local
+    ports:
+      - "${CLIENT_PORT:-6274}:${CLIENT_PORT:-6274}"   # UI
+      - "${SERVER_PORT:-6277}:${SERVER_PORT:-6277}"   # Proxy
+    environment:
+      - CLIENT_PORT=${CLIENT_PORT:-6274}
+      - SERVER_PORT=${SERVER_PORT:-6277}
+      - HOST=${HOST:-0.0.0.0}
+      - DANGEROUSLY_OMIT_AUTH=${DANGEROUSLY_OMIT_AUTH:-false}
+      - MCP_PROXY_AUTH_TOKEN=${MCP_PROXY_AUTH_TOKEN:-}
+      - MCP_AUTO_OPEN_ENABLED=${MCP_AUTO_OPEN_ENABLED:-false}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-https://spanmcp-inspector.spansupport.com}
+      - MCP_SERVER_REQUEST_TIMEOUT=${MCP_SERVER_REQUEST_TIMEOUT:-1000}
+      - MCP_REQUEST_TIMEOUT_RESET_ON_PROGRESS=${MCP_REQUEST_TIMEOUT_RESET_ON_PROGRESS:-true}
+      - MCP_REQUEST_MAX_TOTAL_TIMEOUT=${MCP_REQUEST_MAX_TOTAL_TIMEOUT:-6000}
+      - MCP_PROXY_FULL_ADDRESS=https://spanmcp-inspector.spansupport.com/api
+    restart: unless-stopped
+    networks:
+      - spantools
+
+networks:
+  spantools:
+    external: true
