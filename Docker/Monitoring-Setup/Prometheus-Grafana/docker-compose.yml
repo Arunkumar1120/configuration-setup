@@ -22,7 +22,7 @@ services:
       - 3005:3000
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=Sp@nGrafana#001
+      - GF_SECURITY_ADMIN_PASSWORD=password
     volumes:
       - ./grafana/provisioning/:/etc/grafana/provisioning/
     networks:
