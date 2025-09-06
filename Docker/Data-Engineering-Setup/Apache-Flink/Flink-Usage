@@ -1,0 +1,77 @@
+Apache Flink is an open-source, distributed stream processing framework.
+It’s built to handle unbounded (real-time/continuous) and bounded (batch) data at scale, with strong guarantees (state, consistency, fault tolerance).
+
+Think of it as:
+
+Like Spark, but designed natively for real-time streaming (not just micro-batches).
+
+Like Kafka Streams, but more powerful (stateful processing, windows, exactly-once semantics, scalability).
+
+🔹 Core Features
+
+Stream-first → Batch is treated as a special case of streaming.
+
+Low latency + high throughput → Processes millions of events per second.
+
+Stateful processing → Keeps track of state across events.
+
+Event-time support → Handles late/early events with watermarks.
+
+Fault tolerance → Uses checkpoints & savepoints with exactly-once guarantees.
+
+Runs anywhere → Standalone, YARN, Kubernetes, cloud, or embedded.
+
+🔹 Flink Usage (Where It’s Used)
+ 1. Real-time Analytics
+
+Processing logs, IoT sensor data, clickstreams, financial transactions.
+
+Example: Fraud detection on credit card transactions in milliseconds.
+
+ 2. ETL Pipelines
+
+Ingest from Kafka, transform, enrich, and push to a data warehouse (e.g., Snowflake, S3, Elasticsearch).
+
+Example: Log preprocessing from Kafka → Flink → Elasticsearch → Kibana.
+
+ 3. Event-driven Applications
+
+Complex event processing (CEP).
+
+Example: Detecting patterns (like login failures → suspicious activity).
+
+ 4. Machine Learning & AI
+
+Real-time feature extraction for ML models.
+
+Example: Predicting churn or recommendations while the user is still online.
+
+ 5. Batch + Streaming Unification
+
+You can run the same code for batch and streaming (no need for separate tools).
+
+Example: Nightly batch jobs & continuous data pipelines with same API.
+
+🔹 Example Use Cases in Companies
+
+Netflix → Real-time monitoring of streaming metrics.
+
+Uber → Dynamic pricing, ETA prediction, fraud detection.
+
+Alibaba → Processes trillions of events per day for e-commerce analytics.
+
+Financial services → Risk scoring, fraud detection, compliance checks.
+
+🔹 APIs in Flink
+
+DataStream API → Low-level, powerful, event-by-event processing.
+
+Table / SQL API → Declarative queries, easier for analysts.
+
+CEP (Complex Event Processing) → Pattern detection.
+
+Gelly → Graph processing.
+
+Summary
+Flink = Real-time + Stateful + Scalable data processing framework.
+It’s used for analytics, ETL, event-driven apps, and ML pipelines where real-time matters.
