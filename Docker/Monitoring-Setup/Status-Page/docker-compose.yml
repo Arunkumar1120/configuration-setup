@@ -4,12 +4,12 @@ services:
   status-page:
     image: elestio/uptime-kuma
     ports:
-      - "4000:3001"  # Map container port 80 to host port 8080
+      - "3001:3001"  # Map container port 80 to host port 8080
     environment:
       - DB_TYPE=sqlite
       - DB_STORAGE=/app/data/uptime-kuma.db
       - SOFTWARE_VERSION_TAG=latest
-      - URL=https://de-statuspage.spanllc.com
+      - URL=https://url
     volumes:
       - ./data:/app/data
       - /var/run/docker.sock:/var/run/docker.sock
