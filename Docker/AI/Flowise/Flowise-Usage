@@ -1,0 +1,24 @@
+Official Documentation : https://docs.flowiseai.com/getting-started
+Version : 1.4.3
+
+Flowise is an open-source low-code/no-code tool to build LLM (Large Language Model) apps and workflows.
+Think of it as a drag-and-drop builder for LangChain pipelines, chatbots, RAG (Retrieval-Augmented Generation) systems, and agent workflows.
+
+🔹 Flowise Usage
+1. Chatbot / Q&A Systems
+
+Build chatbots that connect to OpenAI, Anthropic, Llama, HuggingFace models.
+
+Add memory to maintain context across conversations.
+
+Can be embedded into websites or apps.
+
+Example: Customer support chatbot that answers from your company’s docs.
+
+2. RAG (Retrieval-Augmented Generation)
+
+Connects LLMs with vector databases (Pinecone, Weaviate, Qdrant, Milvus, ChromaDB, etc.).
+
+Lets you upload documents (PDF, CSV, Notion, Confluence, etc.) and query them in natural language.
+
+Example: Upload financial reports → ask “What was the revenue growth in Q2 2024?”
