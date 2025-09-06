@@ -1,0 +1,77 @@
+version: "3.30"
+services:
+  outline:
+    image: docker.getoutline.com/outlinewiki/outline:0.84.0
+    user: root
+    ports:
+      - 3001:3000
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      PGSSLMODE: disable
+      SECRET_KEY: "${SECRET_KEY}"
+      UTILS_SECRET: "${UTILS_SECRET}"
+      DATABASE_URL: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${SERVER_IP}:5433/outline"
+      REDIS_URL: "redis://${SERVER_IP}:6380"
+      URL: "${URL}"
+      PORT: "${PORT}"
+      FILE_STORAGE: local
+      FILE_STORAGE_LOCAL_ROOT_DIR: /var/lib/outline/data
+      FILE_STORAGE_UPLOAD_MAX_SIZE: 26214400
+      SLACK_CLIENT_ID: "${SLACK_CLIENT_ID}"
+      SLACK_CLIENT_SECRET: "${SLACK_CLIENT_SECRET}"
+        
+      GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID}"
+      GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET}"
+      GOOGLE_ALLOWED_DOMAINS: "${GOOGLE_ALLOWED_DOMAINS}"
+    networks:
+      outline_network:
+        ipv4_address: 196.168.0.2
+
+    restart: unless-stopped
+
+  redis:
+    image: redis
+    ports:
+      - 6380:6379
+    volumes:
+      - ./redis.conf:/redis.conf
+    command:
+      - redis-server
+      - /redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 3
+    networks:
+      outline_network:
+        ipv4_address: 196.168.0.3      
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16
+    ports:
+      - 5433:5432
+    volumes:
+      - ./database-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "outline"]
+      interval: 30s
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    networks:
+      outline_network:
+        ipv4_address: 196.168.0.4      
+    restart: unless-stopped
+
+
+networks:
+  outline_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 196.168.0.0/24
