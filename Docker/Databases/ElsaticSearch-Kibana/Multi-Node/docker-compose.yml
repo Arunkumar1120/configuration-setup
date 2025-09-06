@@ -1,0 +1,259 @@
+version: '3.8'
+
+services:
+  # Setup service to generate certificates
+  setup:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.3
+    container_name: es-setup
+    user: "0"
+    command: >
+      bash -c '
+        if [ ! -f config/certs/ca.zip ]; then
+          echo "Creating CA";
+          bin/elasticsearch-certutil ca --silent --pem -out config/certs/ca.zip;
+          unzip config/certs/ca.zip -d config/certs;
+        fi;
+        if [ ! -f config/certs/certs.zip ]; then
+          echo "Creating certs";
+          echo -ne \
+          "instances:\n"\
+          "  - name: es-hot\n"\
+          "    dns:\n"\
+          "      - es-hot\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "      - YOUR_SERVER_IP\n"\
+          "  - name: es-warm\n"\
+          "    dns:\n"\
+          "      - es-warm\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "      - YOUR_SERVER_IP\n"\
+          "  - name: es-cold\n"\
+          "    dns:\n"\
+          "      - es-cold\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "      - YOUR_SERVER_IP\n"\
+          "  - name: kibana\n"\
+          "    dns:\n"\
+          "      - kibana\n"\
+          "      - localhost\n"\
+          "    ip:\n"\
+          "      - 127.0.0.1\n"\
+          "      - YOUR_SERVER_IP\n"\
+          > config/certs/instances.yml;
+          bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
+          unzip config/certs/certs.zip -d config/certs;
+        fi;
+        chown -R 1000:1000 config/certs;
+        find . -type d -exec chmod 750 \{\} \;;
+        find . -type f -exec chmod 640 \{\} \;;
+        echo "Waiting for Elasticsearch availability";
+        until curl -s --cacert config/certs/ca/ca.crt https://es-hot:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
+        echo "All done!";
+      '
+    volumes:
+      - ./certs:/usr/share/elasticsearch/config/certs
+    networks:
+      - elastic
+    healthcheck:
+      test: ["CMD-SHELL", "[ -f config/certs/es-hot/es-hot.crt ]"]
+      interval: 1s
+      timeout: 5s
+      retries: 120
+
+  # Hot Node - Master, Data Content, Ingest
+  es-hot:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.3
+    container_name: es-hot
+    environment:
+      - node.name=es-hot
+      - cluster.name=elk-cluster
+      - cluster.initial_master_nodes=es-hot
+      - discovery.seed_hosts=es-warm,es-cold
+      - node.roles=master,data_hot,data,ingest,data_content,remote_cluster_client
+      - node.attr.data=hot
+      - ELASTIC_PASSWORD=your_secure_password
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=certs/es-hot/es-hot.key
+      - xpack.security.http.ssl.certificate=certs/es-hot/es-hot.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/es-hot/es-hot.key
+      - xpack.security.transport.ssl.certificate=certs/es-hot/es-hot.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - bootstrap.memory_lock=true
+      - node.store.allow_mmap=false
+      - "ES_JAVA_OPTS=-Xms6g -Xmx6g"
+      - logger.level=INFO
+      - network.host=0.0.0.0
+      - transport.host=0.0.0.0
+      - http.host=0.0.0.0
+      - cluster.fault_detection.leader_check.timeout=60s
+      - cluster.fault_detection.follower_check.timeout=60s
+      - cluster.fault_detection.follower_check.retry_count=5
+      - cluster.publish.timeout=60s
+      - discovery.probe.connect_timeout=30s
+      - discovery.request_peers_timeout=60s
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./certs:/usr/share/elasticsearch/config/certs
+      - es-hot-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - elastic
+    depends_on:
+      setup:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+    restart: unless-stopped
+
+  # Warm Node - Data Warm Tier
+  es-warm:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.3
+    container_name: es-warm
+    environment:
+      - node.name=es-warm
+      - cluster.name=elk-cluster
+      - discovery.seed_hosts=es-hot,es-cold
+      - node.roles=data_warm
+      - node.attr.data=warm
+      - ELASTIC_PASSWORD=your_secure_password
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=certs/es-warm/es-warm.key
+      - xpack.security.http.ssl.certificate=certs/es-warm/es-warm.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/es-warm/es-warm.key
+      - xpack.security.transport.ssl.certificate=certs/es-warm/es-warm.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - bootstrap.memory_lock=true
+      - node.store.allow_mmap=false
+      - "ES_JAVA_OPTS=-Xms4g -Xmx4g"
+      - logger.level=INFO
+      - network.host=0.0.0.0
+      - transport.host=0.0.0.0
+      - http.host=0.0.0.0
+      - cluster.fault_detection.leader_check.timeout=60s
+      - cluster.fault_detection.follower_check.timeout=60s
+      - cluster.fault_detection.follower_check.retry_count=5
+      - cluster.publish.timeout=60s
+      - discovery.probe.connect_timeout=30s
+      - discovery.request_peers_timeout=60s
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9201:9200"
+      - "9301:9300"
+    volumes:
+      - ./certs:/usr/share/elasticsearch/config/certs
+      - es-warm-data:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+    depends_on:
+      setup:
+        condition: service_healthy
+      es-hot:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+    restart: unless-stopped
+
+  # Cold Node - Data Cold Tier
+  es-cold:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.0.3
+    container_name: es-cold
+    environment:
+      - node.name=es-cold
+      - cluster.name=elk-cluster
+      - discovery.seed_hosts=es-hot,es-warm
+      - node.roles=data_cold
+      - node.attr.data=cold
+      - ELASTIC_PASSWORD=your_secure_password
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=certs/es-cold/es-cold.key
+      - xpack.security.http.ssl.certificate=certs/es-cold/es-cold.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.key=certs/es-cold/es-cold.key
+      - xpack.security.transport.ssl.certificate=certs/es-cold/es-cold.crt
+      - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - bootstrap.memory_lock=true
+      - node.store.allow_mmap=false
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+      - logger.level=INFO
+      - network.host=0.0.0.0
+      - transport.host=0.0.0.0
+      - http.host=0.0.0.0
+      - cluster.fault_detection.leader_check.timeout=60s
+      - cluster.fault_detection.follower_check.timeout=60s
+      - cluster.fault_detection.follower_check.retry_count=5
+      - cluster.publish.timeout=60s
+      - discovery.probe.connect_timeout=30s
+      - discovery.request_peers_timeout=60s
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9202:9200"
+      - "9302:9300"
+    volumes:
+      - ./certs:/usr/share/elasticsearch/config/certs
+      - es-cold-data:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+    depends_on:
+      setup:
+        condition: service_healthy
+      es-hot:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+    restart: unless-stopped
+
+volumes:
+  certs:
+    driver: local
+  es-hot-data:
+    driver: local
+  es-warm-data:
+    driver: local
+  es-cold-data:
+    driver: local
+  kibana-data:
+    driver: local
+
+networks:
+  elastic:
+    external: true
