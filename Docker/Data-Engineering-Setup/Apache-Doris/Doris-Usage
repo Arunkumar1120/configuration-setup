@@ -1,4 +1,6 @@
 Official Documentation : https://doris.apache.org/docs/2.0/install/cluster-deployment/run-docker-cluster
+Frontend Doris Version : fe-3.0.7
+Backend Doris Version : be-3.0.7
 
 Apache Doris is an open-source, high-performance real-time analytical database (OLAP).
 It’s designed for fast queries on large-scale data, especially for analytics dashboards, reporting, and ad-hoc queries.
