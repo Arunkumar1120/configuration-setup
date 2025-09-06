@@ -1,0 +1,47 @@
+Official Documentation : https://kafka.apache.org/quickstart
+Version : 4.1.0
+
+🔹 1. Apache Kafka
+
+What it is: A distributed event streaming platform.
+Usage:
+
+Publish & subscribe to event streams.
+
+Store streams reliably and at scale.
+
+Process streams in real-time.
+
+
+🔹 2. Schema Registry
+
+What it is: A centralized schema management service (usually with Confluent).
+Usage:
+
+Ensures producers & consumers agree on data format (Avro/JSON/Protobuf).
+
+Supports schema evolution (backward/forward compatibility).
+
+Prevents “bad data” from breaking consumers.
+
+
+🔹 3. ksqlDB
+
+What it is: A streaming SQL engine for Kafka.
+Usage:
+
+Process Kafka topics with SQL-like queries (no Java code needed).
+
+Create materialized views and new Kafka topics.
+
+Real-time joins, aggregations, filters.
+
+🔹 How They Work Together
+
+Kafka: Stores event streams.
+
+Schema Registry: Ensures all events have a defined schema.
+
+ksqlDB: Lets you query & transform those streams in real time.
+
+Kafka UI: Lets you monitor and manage the cluster easily.
