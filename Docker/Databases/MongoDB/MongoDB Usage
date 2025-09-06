@@ -21,3 +21,5 @@ Rich queries → Filters, aggregation, geospatial, full-text search.
 Indexes → Support on any field for fast lookups.
 
 Integration → Works natively with Node.js, Python, Go, Java, etc.
+
+MongoDump Command : docker exec -it mongo mongodump --username username --password password --out /current-directory
