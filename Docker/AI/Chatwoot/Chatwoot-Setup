@@ -31,7 +31,7 @@ docker compose run --rm rails bundle exec rails db:chatwoot_prepare
 docker compose up -d
 
 Chatwoot
- is an open-source customer engagement platform, often called an alternative to Intercom or Zendesk.
+It is an open-source customer engagement platform, often called an alternative to Intercom or Zendesk.
 It provides live chat + multichannel inbox + automation for customer support and sales.
 
 🔹 Chatwoot Usage
