@@ -1,0 +1,41 @@
+version: '3'
+services:
+  mongo:
+    image: mongo:${MONGO_VERSION}
+    container_name: mongo
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: admin
+    entrypoint:
+      - bash
+      - -c
+      - |
+        if [ ! -f ${MONGO_REPLICA_SET_KEY_FILE} ]; then
+          echo "Generating replica set key file..."
+          openssl rand -base64 756 > ${MONGO_REPLICA_SET_KEY_FILE}
+          chmod 600 ${MONGO_REPLICA_SET_KEY_FILE}
+          chown 999:999 ${MONGO_REPLICA_SET_KEY_FILE}
+        fi
+        exec docker-entrypoint.sh "$$@"
+    command: "mongod --bind_ip_all --replSet ${MONGO_REPLICA_SET_NAME} --keyFile ${MONGO_REPLICA_SET_KEY_FILE}"
+    volumes:
+      - ./data:/data/db
+    networks:
+      - mongodb
+  mongo-setup:
+    image: mongo:${MONGO_VERSION}
+    container_name: mongo_setup_tbsefile-dev-new
+    depends_on:
+      - mongo-tbsefile-dev-new
+    restart: on-failure
+    entrypoint: ["/bin/bash", "/setup_mongo.sh"]
+    volumes:
+      - ./setup_mongo.sh:/setup_mongo.sh
+    networks:
+      - mongodb
+networks:
+  mongodb:
+    external: true
