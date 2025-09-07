@@ -1,0 +1,21 @@
+- name: Create IIS certificate
+  hosts: 123paystubs
+  gather_facts: yes
+  vars:
+    dir: ["dir_name"]
+    host: ["url"]
+  tasks:
+    - name: Add a HTTPS binding with host header and SNI enabled
+      community.windows.win_iis_webbinding:
+       name: '{{ item.0 }}'
+       protocol: https
+       port: 443
+       ip: ip
+       host_header: '{{ item.1 }}'
+       ssl_flags: 1
+       certificate_hash: 0a315f99149cc153a4d14772517bd75679c0d1f0
+       state: present
+      with_together:
+       - '{{ dir }}'
+       - '{{ host }}'
+

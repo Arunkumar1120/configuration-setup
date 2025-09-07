@@ -1,0 +1,178 @@
+---
+- name: Installing Windows Application
+  hosts: Hostname
+  gather_facts: yes
+  tasks:
+    - name: Download the SQL-Server-management-studio
+      win_get_url:
+       URL: https://aka.ms/ssmsfullsetup
+       dest: D:\DevOps\SSMS-Setup-ENU.exe
+
+    - name: Install SQL-Server-management-studio
+      win_package:
+       path: D:\DevOps\SSMS-Setup-ENU.exe
+       arguments: '/q /norestart' 
+       state: present
+
+    - name: Download the .NetRuntime 6.0.0
+      win_get_url:
+       URL: https://download.visualstudio.microsoft.com/download/pr/14ccbee3-e812-4068-af47-1631444310d1/3b8da657b99d28f1ae754294c9a8f426/dotnet-sdk-5.0.408-win-x64.exe
+       dest: D:\DevOps\dotnet-runtime-6.0.14-win-x64.exe
+
+    - name: Install .NetRuntime 6.0.0
+      win_package:
+       path: D:\DevOps\dotnet-runtime-6.0.14-win-x64.exe
+       arguments: '/q /norestart' 
+       state: present
+
+    - name: Download the .NetRuntime 5.0.0
+      win_get_url:
+       URL: https://download.visualstudio.microsoft.com/download/pr/a0832b5a-6900-442b-af79-6ffddddd6ba4/e2df0b25dd851ee0b38a86947dd0e42e/dotnet-runtime-5.0.17-win-x64.exe
+       dest: D:\DevOps\dotnet-runtime-5.0.17-win-x64.exe
+
+    - name: Install .NetRuntime 5.0.0
+      win_package:
+       path: D:\DevOps\dotnet-runtime-5.0.17-win-x64.exe
+       arguments: '/q /norestart' 
+       state: present  
+
+    - name: Create a file for DevOps
+      ansible.windows.win_file:
+        path: D:\DevOps\
+        state: directory 
+
+    - name: Copy the Choclatey Application
+      win_copy:
+         src: PS/choclatey.ps1
+         dest: D:\DevOps\
+
+    - name: Run Choclatey Application
+      win_shell: D:\DevOps\choclatey.ps1
+
+    - name: Install gitbash
+      win_chocolatey:
+        name: git
+        state: present
+
+    - name: git detached headmessage
+      win_copy:
+         src: PS/git.ps1
+         dest: D:\DevOps\
+
+    - name: Run git detached headmessage
+      win_shell: D:\DevOps\git.ps1     
+ 
+    
+    - name: Install 7zip
+      win_chocolatey:
+        name: 7zip
+        state: present  
+
+    - name: Copy the 7zip file 
+      win_copy:
+        src: C:\Program Files\7-Zip\7z.exe
+        dest: C:\Windows\System32\7z.exe
+        remote_src: True  
+    
+    - name: Download the Web Platform Application
+      win_get_url:
+       URL: https://www.microsoft.com/web/handlers/webpi.ashx?command=getinstallerredirect&appid=urlrewrite2
+       dest: D:\DevOps\urlrewrite2.exe
+
+    - name: Install Web Platform Application
+      win_package:
+        path: D:\DevOps\urlrewrite2.exe
+        arguments: '/q /norestart' 
+        state: present      
+
+
+    - name: Download the IIS Url Rewrite Application
+      win_get_url:
+       URL: https://download.microsoft.com/download/1/2/8/128E2E22-C1B9-44A4-BE2A-5859ED1D4592/rewrite_amd64_en-US.msi
+       dest: D:\DevOps\rewrite_amd64_en-US.msi
+
+    - name: Install IIS Url Rewrite Application
+      win_package:
+        path: D:\DevOps\rewrite_amd64_en-US.msi
+        arguments: '/q /norestart' 
+        state: present
+
+    - name: Install dotnetcore
+      win_chocolatey:
+        name: dotnetcore
+        version: '3.1.9'
+#       source: http://internal/odata/repo
+        state: present    
+
+    - name: Install nuget.commandline
+      win_chocolatey:
+        name: nuget.commandline
+        version: '6.4.0'
+        state: present
+
+        #  - name: Install visualstudio2022buildtools
+        #win_chocolatey:
+        #name: visualstudio2022buildtools
+        #version: '117.5.3.0'
+        #state: present
+    
+    - name: Download the .Netcore-Server Hosting 1.0.0
+      win_get_url:
+       URL: https://download.visualstudio.microsoft.com/download/pr/c6b9a396-5e7a-4b91-86f6-f9e8df3bf1dd/6d61addfd6069e404981bede03f8f4f9/dotnet-dev-win-x64.1.1.14.exe
+       dest: D:\DevOps\dotnet-dev-win-x64.1.1.14.exe
+
+    - name: Install the .Netcore-Server Hosting 1.0.0
+      win_package:
+       path: D:\DevOps\dotnet-dev-win-x64.1.1.14.exe
+       arguments: '/q /norestart' 
+       state: present
+
+    - name: Download the .Netcore-Server Hosting 3.1.426
+      win_get_url:
+       URL: https://download.visualstudio.microsoft.com/download/pr/b70ad520-0e60-43f5-aee2-d3965094a40d/667c122b3736dcbfa1beff08092dbfc3/dotnet-sdk-3.1.426-win-x64.exe
+       dest: D:\DevOps\dotnet-sdk-3.1.426-win-x64.exe
+
+    - name: Install the .Netcore-Server Hosting 3.1.426
+      win_package:
+       path: D:\DevOps\dotnet-sdk-3.1.426-win-x64.exe
+       arguments: '/q /norestart' 
+       state: present
+
+    - name: Download the .Netcore-Sdk 6.0 x64
+      win_get_url:
+       URL: https://download.visualstudio.microsoft.com/download/pr/01dfbf9b-d2d1-4bd2-acb1-51d998c4812e/cf4fd6732540a78b4f44cbd9a285ce80/dotnet-sdk-6.0.405-win-x64.exe
+       dest: D:\DevOps\dotnet-sdk-6.0.405-win-x64.exe
+
+    - name: Install the .Netcore-Sdk 6.0 x64
+      win_package:
+       path: D:\DevOps\dotnet-sdk-6.0.405-win-x64.exe
+       arguments: '/q /norestart' 
+       state: present
+
+    - name: Download the .Netcore-Sdk 6.0 x86
+      win_get_url:
+       URL: https://download.visualstudio.microsoft.com/download/pr/5eacdd37-c806-41fd-8062-ce918137dd96/15f5164a86b4830f2669036cf1e2dafa/dotnet-sdk-6.0.405-win-x86.exe
+       dest: D:\DevOps\dotnet-sdk-6.0.405-win-x86.exe
+
+    - name: Install the .Netcore-Sdk 6.0 x86
+      win_package:
+       path: D:\DevOps\dotnet-sdk-6.0.405-win-x86.exe
+       arguments: '/q /norestart' 
+       state: present
+
+    - name: Download the Access Database Engine Application
+      win_get_url:
+       URL: https://download.microsoft.com/download/2/4/3/24375141-E08D-4803-AB0E-10F2E3A07AAA/AccessDatabaseEngine_X64.exe
+       dest: D:\DevOps\AccessDatabaseEngine_X64.exe
+
+    - name: Install Access Database Engine Application
+      win_package:
+       path: D:\DevOps\AccessDatabaseEngine_X64.exe
+       arguments: '/q /norestart' 
+       state: present        
+
+    - name: Install netfx-4.8-devpack
+      win_chocolatey:
+        name: netfx-4.8-devpack
+        version: '4.8.0.20190930'
+        state: present

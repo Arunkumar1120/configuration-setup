@@ -1,0 +1,52 @@
+---
+- name: Installing Windows Application
+  hosts: Hostname
+  gather_facts: yes
+  tasks:
+
+    - name: Copy the Choclatey Application
+      win_copy:
+         src: PS/choclatey.ps1
+         dest: D:\Dependency\
+
+    - name: Run Choclatey Application
+      win_shell: D:\Dependency\choclatey.ps1
+
+    - name: Copy the Choclatey Application
+      win_copy:
+         src: PS/choclatey.ps1
+         dest: D:\Dependency\
+
+    - name: Run Choclatey Application
+      win_shell: D:\Dependency\choclatey.ps1
+
+
+    - name: Copy the Choclatey Application
+      win_copy:
+         src: PS/choclatey.ps1
+         dest: D:\Dependency\
+
+    - name: Run Choclatey Application
+      win_shell: D:\Dependency\choclatey.ps1
+
+    - name: Install gitbash
+      win_chocolatey:
+        name: git
+        state: present
+
+    - name: Install netfx-4.8-devpack
+      win_chocolatey:
+        name: netfx-4.8-devpack
+        version: '4.8.0.20190930'
+        state: present
+
+    - name: Install 7zip
+      win_chocolatey:
+        name: 7zip
+        state: present
+
+    - name: Copy the 7zip file
+      win_copy:
+        src: C:\Program Files\7-Zip\7z.exe
+        dest: C:\Windows\System32\7z.exe
+        remote_src: True
