@@ -1,0 +1,93 @@
+- name: Downloading {{ app_name }} tar ball
+  win_get_url:
+    url: "{{ nexus_url }}"
+    dest: '{{ backup }}\'
+    url_username: "{{ nexus_username }}"
+    url_password: "{{ nexus_password }}"
+  tags: download
+
+- block:
+
+
+  - name: stopping "{{ app_name }}" app pool
+    win_iis_webapppool:
+      name: "{{ app_name }}"
+      state: stopped
+    ignore_errors: true
+    tags: stop_app_pool
+  
+  - name: stopping "{{ app_name }}" site 
+    win_iis_website:
+      name: "{{ app_name }}"
+      state: stopped
+    ignore_errors: true
+    tags: stop_site    
+   
+  - name: Backup
+    win_shell: "{{ item }}"
+    with_items:    
+      - Remove-Item -Path {{ backup }}\{{ app_name }}-{{ latest_version }}-prevBackup.zip -Force 
+      - 7z a -tzip "{{ backup }}\{{ app_name }}-{{ latest_version }}-prevBackup.zip" "{{ base_dir }}\{{ app_name }}"   
+    ignore_errors: true
+    tags: backup
+
+  - name: extracting archive using 7z
+    win_command: "{{ item }}"
+    with_items:     
+      - 7z x -tzip "{{ backup }}\{{ app_name }}-{{ latest_version }}.zip" -o"{{ backup }}\{{ app_name }}\" -y
+      #- 7z x -y "{{ backup }}\{{ app_name }}\{{ app_name }}-{{ latest_version }}-SNAPSHOT" -o"{{ backup }}\{{ app_name }}\"
+    tags: extract
+  
+  - name: deleting the tar file
+    win_file:
+      name: "{{ item }}"
+      state: absent
+    with_items:
+      - '{{ backup }}\{{ app_name }}-{{ latest_version }}.zip'
+
+        #  - name: deleting contents inside "{{ base_dir }}\{{ app_name }}\" directory.
+        # win_shell: Remove-Item -Exclude  Web.config, web.config, appsettings.json, *.dll, *.pdb, .well-known, wwwroot, logs, ClientApp, -R {{ base_dir }}\{{ app_name }}\  
+        # ignore_errors: true
+        #   tags: deletecontent
+
+  - name: deleting contents inside "{{ base_dir }}\{{ app_name }}\ClientApp\" directory
+    win_shell: Remove-Item -R {{ base_dir }}\{{ app_name }}\ClientApp\
+    ignore_errors: true
+    tags: deletecontent
+  
+
+  - name: Copy extracted files to "{{ base_dir }}\{{ app_name }}\ClientApp\" folder
+    win_copy:
+      src: '{{ backup }}\{{ app_name }}\'
+      dest: '{{ base_dir }}\{{ app_name }}\ClientApp\'
+      remote_src: True    
+
+  - name: Removing unzipped {{ app_name }} folder
+    win_shell: |
+      start-sleep 15
+      Remove-Item -R -Force -Path {{ backup }}\{{ app_name }}
+
+  - name: Changing permissions for IIS_IUSRS
+    win_acl:
+       path: '{{ base_dir }}\{{ app_name }}'
+       user: IIS_IUSRS
+       rights: FullControl
+       type: allow
+       state: present
+       inherit: ContainerInherit, ObjectInherit
+       propagation: 'None'
+
+
+  - name: starting "{{ app_name }}" app pool
+    win_iis_webapppool:
+      name: "{{ app_name }}"
+      state: started
+    tags: stop_app_pool
+  
+  - name: starting "{{ app_name }}" site 
+    win_iis_website:
+      name: "{{ app_name }}"
+      state: started
+    tags: stop_site
+
+

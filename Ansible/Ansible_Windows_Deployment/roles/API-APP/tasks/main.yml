@@ -1,0 +1,116 @@
+- name: Downloading {{ app_name }} tar ball
+  win_get_url:
+    url: "{{ nexus_url }}"
+    dest: '{{ backup }}\'
+    url_username: "{{ nexus_username }}"
+    url_password: "{{ nexus_password }}"
+  tags: download
+
+- block:
+
+
+  - name: stopping "{{ app_name }}" app pool
+    win_iis_webapppool:
+      name: "{{ app_name }}"
+      state: stopped
+    ignore_errors: true
+    tags: stop_app_pool
+  
+  - name: stopping "{{ app_name }}" site 
+    win_iis_website:
+      name: "{{ app_name }}"
+      state: stopped
+    ignore_errors: true
+    tags: stop_site    
+  
+  - name: Backup
+    win_shell: "{{ item }}"
+    with_items:    
+      - Remove-Item -Path {{ backup }}\{{ app_name }}-{{ latest_version }}-{{ app_type }}-{{ old }}-prevBackup.zip -Force 
+      - 7z a -tzip {{ backup }}\{{ app_name }}-{{ latest_version }}-{{ app_type }}-{{ old }}-prevBackup.zip {{ base_dir }}\{{ app_name }}\{{ app_type }}\{{ old }}     
+    ignore_errors: true
+    tags: backup 
+
+  - name: Creating new directory inside {{ app_name }}\{{ app_type }}\ folder
+    win_file:
+      path: "{{ base_dir }}\\{{ app_name }}\\{{ app_type }}\\{{ new }}"
+      state: directory
+    when: folder == "Yes"
+
+  - name: Copy files to "{{ base_dir }}\{{ app_name }}\{{ app_type }}\{{ new }}\" folder
+    win_copy:
+     src: '{{ base_dir }}\{{ app_name }}\{{ app_type }}\{{ old }}\'
+     dest: '{{ base_dir }}\{{ app_name }}\{{ app_type }}\{{ new }}\'
+     remote_src: True
+    when: folder == "Yes"
+   
+
+  - name: Convert folder to IIS application
+    win_iis_webapplication:
+     site: "{{ app_name }}"  # Replace with the name of your site
+     name: "{{ app_type }}/{{ new }}"
+     state: present
+     physical_path: "{{ base_dir }}\\{{ app_name }}\\{{ app_type }}\\{{ new }}" 
+     app_pool: "{{ app_name }}"
+    ignore_errors: true 
+    when: folder == "Yes"
+    tags: convert_to_app  
+
+  - name: extracting archive using 7z
+    win_command: "{{ item }}"
+    with_items:     
+      - 7z x -tzip "{{ backup }}\{{ app_name }}-{{ latest_version }}.zip" -o"{{ backup }}\{{ app_name }}\" -y
+      #- 7z x -y "{{ backup }}\{{ app_name }}\{{ app_name }}-{{ latest_version }}-SNAPSHOT" -o"{{ backup }}\{{ app_name }}\"
+    tags: extract
+  
+  - name: deleting the tar file
+    win_file:
+      name: "{{ item }}"
+      state: absent
+    with_items:
+      - '{{ backup }}\{{ app_name }}-{{ latest_version }}.zip'
+
+  - name: deleting contents inside "{{ base_dir }}\{{ app_name }}\{{ app_type }}\{{ new }}\" directory.
+    win_shell: Remove-Item -Exclude Web.config, web.config, appsettings.json -R {{ base_dir }}\{{ app_name }}\{{ app_type}}\{{ new }}\
+    ignore_errors: true
+ 
+  - name: Copy extracted files to "{{ base_dir }}\{{ app_name }}\" folder
+    win_copy:
+      src: '{{ backup }}\{{ app_name }}\'
+      dest: '{{ base_dir }}\{{ app_name }}\{{ app_type }}\{{ new }}\'
+      remote_src: True    
+
+  - name: Removing unzipped {{ app_name }} folder
+    win_shell: |
+      start-sleep 15
+      Remove-Item -R -Force -Path {{ backup }}\{{ app_name }}
+
+  - name: Changing permissions for IIS_IUSRS
+    win_acl:
+       path: '{{ base_dir }}\{{ app_name }}'
+       user: IIS_IUSRS
+       rights: FullControl
+       type: allow
+       state: present
+       inherit: ContainerInherit, ObjectInherit
+       propagation: 'None'
+
+  - name: Creating logs directory inside {{ app_name }} folder
+    win_file:
+      path: '{{ base_dir }}\{{ app_name }}\{{ app_type }}\{{ new }}\Logs'
+      state: directory
+
+
+  - name: starting "{{ app_name }}" app pool
+    win_iis_webapppool:
+      name: "{{ app_name }}"
+      state: started
+    tags: stop_app_pool
+  
+  - name: starting "{{ app_name }}" site 
+    win_iis_website:
+      name: "{{ app_name }}"
+      state: started
+    tags: stop_site
+
+

@@ -1,0 +1,10 @@
+- name: Downloading {{ app_name }} tar ball
+  win_get_url:
+    url: "{{ nexus_url }}"
+    dest: '{{ backup }}\'
+    url_username: "{{ nexus_username }}"
+    url_password: "{{ nexus_password }}"
+  tags: download
+
+  
+

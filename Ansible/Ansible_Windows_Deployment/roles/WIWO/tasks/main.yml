@@ -1,0 +1,106 @@
+- name: Downloading {{ app_name }} tar ball
+  win_get_url:
+    url: "{{ nexus_url }}"
+    dest: '{{ backup }}\'
+    url_username: "{{ nexus_username }}"
+    url_password: "{{ nexus_password }}"
+  tags: download
+
+- block:
+
+
+  - name: Create a new service {{ app_name }}
+    ansible.windows.win_service:
+      name: "{{ app_name }}"
+      path: '{{ base_dir }}\Window Services\{{ app_name }}\{{ app_name }}.exe'
+      display_name: "{{ app_name }}"
+      description: For "{{ app_name }}"
+
+  - name: Backup
+    win_shell: "{{ item }}"
+    with_items:    
+      - Remove-Item -Path {{ backup }}\{{ app_name }}-{{ latest_version }}-prevBackup.zip -Force 
+      - 7z a -tzip "{{ backup }}\{{ app_name }}-{{ latest_version }}-prevBackup.zip" "{{ base_dir }}\Window Services\{{ app_name }}"     
+    ignore_errors: true
+    tags: backup    
+    
+  - name: extracting archive using 7z
+    win_command: "{{ item }}"
+    with_items:     
+      - 7z x -tzip "{{ backup }}\{{ app_name }}-{{ latest_version }}.zip" -o"{{ backup }}\{{ app_name }}\" -y
+      #- 7z x -y "{{ backup }}\{{ app_name }}\{{ app_name }}-{{ latest_version }}-SNAPSHOT" -o"{{ backup }}\{{ app_name }}\"
+    tags: extract
+ 
+  - name: stopping service 123PayStubs.WatcherService
+    win_service:
+      name: "123PayStubs.WatcherService"
+      state: stopped
+      force_dependent_services: yes
+    ignore_errors: true
+    tags: stopping
+    when: WatcherService == "Yes"
+
+
+  - name: stopping service
+    win_service:
+      name: "{{ app_name }}"
+      state: stopped
+      force_dependent_services: yes
+    ignore_errors: true
+    tags: stopping
+ 
+  - name: deleting the tar file
+    win_file:
+      name: "{{ item }}"
+      state: absent
+    with_items:
+      - '{{ backup }}\{{ app_name }}-{{ latest_version }}.zip'
+
+
+  - name: deleting contents inside "{{ base_dir }}\\Window Services\\{{ app_name }}\\" directory.
+    win_shell:  Get-ChildItem -Path "{{ base_dir }}\\Window Services\\{{ app_name }}" -Recurse -Exclude *.json, *.config | Remove-Item -Force -Recurse 
+    ignore_errors: true
+    tags: deleteinsidebase
+
+  - name: deleting contents inside "{{ backup }}\\{{ app_name }}\\" directory.
+    win_shell:  Get-ChildItem -Path "{{ backup }}\\{{ app_name }}" -Recurse -Include *.json, *.config | Remove-Item -Force -Recurse
+    ignore_errors: true
+    tags: deleteinside
+
+
+  - name: Copy extracted files to "{{ base_dir }}\Window Services\{{ app_name }}" folder
+    win_copy:
+      src: '{{ backup }}\{{ app_name }}\'
+      dest: '{{ base_dir }}\Window Services\{{ app_name }}\'
+      remote_src: True 
+    tags: copy  
+
+  - name: Removing unzipped {{ app_name }} folder
+    win_shell: |
+      start-sleep 15
+      Remove-Item -R -Force -Path {{ backup }}\{{ app_name }}
+
+  - name: Creating logs directory inside {{ app_name }} folder
+    win_file:
+      path: '{{ base_dir }}\Window Services\{{ app_name }}\Logs'
+      state: directory
+
+
+  - name: starting service
+    win_service:
+      name: "{{ app_name }}"
+      state: started
+      force_dependent_services: yes
+    ignore_errors: true 
+    tags: starting
+
+  - name: starting service 123PayStubs.WatcherService
+    win_service:
+      name: "123PayStubs.WatcherService"
+      state: started
+      force_dependent_services: yes
+    ignore_errors: true
+    tags: starting
+    when: WatcherService == "Yes"
+  
+

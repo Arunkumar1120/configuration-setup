@@ -1,0 +1,9 @@
+- hosts: "123PS"
+  gather_facts: yes
+  vars:
+    app_name: ''
+    latest_version: ''
+    nexus_url: 'https://stsartifacts.spanllc.com/repository/123PS/{{ env_repo }}/{{ app_name }}/{{ app_name }}-{{ latest_version }}.zip'
+
+  roles:
+   - WIWO
