@@ -1,0 +1,62 @@
+#!groovy
+import jenkins.model.*
+import hudson.*
+import hudson.model.*
+import groovy.json.*
+
+import java.text.SimpleDateFormat
+
+def date = new Date()
+today = new SimpleDateFormat("ddMMyyyy")
+def COLOR_MAP = ['SUCCESS': '#00FF00', 'FAILURE': '#FF0000', 'UNSTABLE': '#FFFF00', 'ABORTED': '#800000']
+
+properties([
+    parameters([
+        choice(
+            name: 'Key_File',
+            choices: ["NA", "keyfile1"],
+            description: 'Select the SSH Key file'
+        ),
+        string(
+            name: 'VG_NAME',   // Fixed: No space
+            description: "Enter the Volume Group Name"
+        ),  
+        string(
+            name: 'LV_NAME',   // Fixed: No space
+            description: "Enter the Logical Volume Name"
+        ),     
+        string(
+            name: 'MOUNT_PATH',   // Fixed: No space
+            description: "Enter the Mount Path"
+        ),         
+        string(
+            name: 'IP',
+            description: "Enter the target server IP"
+        )
+    ])
+])
+
+pipeline {
+    agent {
+        label 'spanansible'
+    }
+
+    environment {
+        AnsibleLocation = "/home/ubuntu/Ansible/block-volume"
+    }
+
+    stages {
+        stage('Run Ansible Playbook') {
+            steps {
+                script {
+                    dir(env.AnsibleLocation) {
+                        sh "pwd"
+                        // Construct the Ansible playbook command with the parameters
+                        sh "sudo ansible-playbook -i ${params.IP}, blockvolume.yaml --private-key ${params.Key_File} -u ubuntu --extra-vars 'vg_name=${params.VG_NAME} lv_name=${params.LV_NAME} mount_path=/${params.MOUNT_PATH}' --ssh-common-args='-o StrictHostKeyChecking=no'" 
+                        //sh ansibleCommand
+                    }
+                }
+            }
+        }
+    } //stages
+} //pipeline block
