@@ -1,0 +1,58 @@
+---
+- name: Configure LVM and Mount Block Volume
+  hosts: all
+  become: true
+  vars:
+    vg_name: "{{ vg_name }}"  # Get from Jenkins
+    lv_name: "{{ lv_name }}"  # Get from Jenkins
+    mount_path: "{{ mount_path }}"  # Get from Jenkins
+
+  tasks:
+    - name: Gather facts
+      setup:
+
+    - name: Get unpartitioned disk device
+      shell: "lsblk -nd -o NAME,TYPE | awk '$2 == \"disk\" {print $1}' | while read d; do lsblk -no PARTTYPE /dev/$d | grep -q . || echo $d; done"
+      register: disk_device
+      changed_when: false
+
+    - name: Create a Physical Volume (PV) on unpartitioned disk
+      command: "pvcreate /dev/{{ disk_device.stdout_lines[0] }}"
+      ignore_errors: yes
+      changed_when: false        
+
+    - name: Create a Volume Group (VG)
+      command: vgcreate {{ vg_name }} /dev/{{ disk_device.stdout_lines[0] }} 
+      when: vg_name not in ansible_facts['lvm']['volume_groups'] | default([])
+
+    - name: Create a Logical Volume (LV)
+      command: lvcreate -n {{ lv_name }} -l 100%FREE {{ vg_name }}
+      when: lv_name not in ansible_facts['lvm']['logical_volumes'] | default([])
+
+    - name: Format the Logical Volume
+      command: mkfs.ext4 /dev/{{ vg_name }}/{{ lv_name }}
+      when: lv_name not in ansible_facts['mounts'] | default([])
+
+    - name: Create Mount Directory
+      file:
+        path: "{{ mount_path }}"
+        state: directory
+
+    - name: Mount the Logical Volume
+      mount:
+        path: "{{ mount_path }}"
+        src: /dev/{{ vg_name }}/{{ lv_name }}
+        fstype: ext4
+        state: mounted
+
+    - name: Add entry to /etc/fstab
+      lineinfile:
+        path: /etc/fstab
+        line: "/dev/{{ vg_name }}/{{ lv_name }} {{ mount_path }} ext4 defaults 0 0"
+        state: present
+        create: true
+
+  handlers:
+    - name: Reload fstab
+      systemd:
+        daemon_reload: yes
